@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
         borderWidth: 1.5,
         borderRadius: 18,
         flexDirection: "row",
-        width: "95%",
+        width: "100%",
         padding: 26,
         backgroundColor: "#2e2d2d",
         marginVertical: 8
