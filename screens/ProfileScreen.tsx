@@ -1,22 +1,96 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { auth } from '../firebase/Config';
+import { signOut } from 'firebase/auth';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type Props = {}
 
 const ProfileScreen = (props: Props) => {
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    try {
+      await signOut(auth);
+    } catch (error: any) {
+      Alert.alert('Error', error.message);
+      setIsSigningOut(false);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
-      <Text>ProfileScreen</Text>
-    </SafeAreaView>
-  )
-}
+      <View style={styles.contentContainer}>
+        <Text style={styles.title}>Profile</Text>
+        <Text style={styles.subtitle}>{auth.currentUser?.email}</Text>
 
-export default ProfileScreen
+        <TouchableOpacity
+          onPress={handleSignOut}
+          disabled={isSigningOut}
+          style={styles.buttonContainer}
+        >
+          <LinearGradient
+            colors={['#FFCA28', '#FF6F00']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.button}
+          >
+            {isSigningOut ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>SIGN OUT</Text>
+            )}
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
+};
+
+export default ProfileScreen;
 
 const styles = StyleSheet.create({
   safeAreaContainer: {
     flex: 1,
     backgroundColor: "#262626"
+  },
+  contentContainer: {
+    flex: 1,
+    paddingHorizontal: 24,
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#AAAAAA',
+    marginBottom: 32,
+  },
+  buttonContainer: {
+    borderRadius: 25,
+    overflow: 'hidden',
+    shadowColor: '#FF6F00',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  button: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 25,
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+    letterSpacing: 1,
   }
-})
+});
