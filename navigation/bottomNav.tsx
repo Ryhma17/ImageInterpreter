@@ -28,14 +28,14 @@ const AppTabs = (props: Props) => {
         <Tab.Screen name="History" component={HistoryScreen} options={{
             title: "",
             tabBarIcon: ({color, size, focused}) => (
-                <Ionicons name="list-circle" color={focused ? "#ebb031" : "#e4dede"} size={30} />
+                <Ionicons name="list-circle-outline" color={focused ? "#ebb031" : "#e4dede"} size={30} />
             )
         }}
         />
         <Tab.Screen name="Camera" component={CameraScreen} options={{
             title: "",
             tabBarIcon: ({color, size, focused}) => (
-                <Ionicons name="camera" color={focused ? "#ebb031" : "#e4dede"} size={30} />
+                <Ionicons name="camera-outline" color={focused ? "#ebb031" : "#e4dede"} size={30} />
             )
         }}
         />
@@ -43,7 +43,7 @@ const AppTabs = (props: Props) => {
             
             title: "",
             tabBarIcon: ({color, size, focused}) => (
-                <Ionicons name="person-circle" color={focused ? "#ebb031" : "#e4dede"} size={30} />
+                <Ionicons name="person-circle-outline" color={focused ? "#ebb031" : "#e4dede"} size={30} />
             )
         }}
         />
