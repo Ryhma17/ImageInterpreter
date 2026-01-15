@@ -2,7 +2,6 @@ import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import PressableButton from '../components/PressableButton'
-import { Ionicons } from "@expo/vector-icons"
 
 type Props = {}
 
@@ -11,8 +10,8 @@ const CameraScreen = (props: Props) => {
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
       <Text style={styles.title}> New Scan</Text>
-      <PressableButton icon={"camera"} text='Take Photo'/>
-      <PressableButton icon={"images"} text='Chooose from Gallery'/>
+      <PressableButton icon="camera" text='Take Photo'/>
+      <PressableButton icon="images" text='Chooose from Gallery'/>
     </SafeAreaView>
   )
 }
