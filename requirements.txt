@@ -3,3 +3,5 @@
 @react-navigation/bottom-tabs
 react-native-screens
 react-native-safe-area-context
+firebase
+expo-linear-gradient
