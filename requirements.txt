@@ -5,3 +5,4 @@ react-native-screens
 react-native-safe-area-context
 firebase
 expo-linear-gradient
+expo-image-picker

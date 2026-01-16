@@ -1,31 +1,27 @@
 import { StyleSheet, Text, View, Pressable, Image} from 'react-native'
 import React from 'react'
-import { IoniconsType } from '../types/IconTypes'
-import { Ionicons } from "@expo/vector-icons"
-
 
 type Props = {
-    icon: IoniconsType,
     text: string,
+    BgColor: string,
     onPress: () => void
 }
 
-const PressableButton = ({icon, text, onPress}: Props) => {
+const BasicButton = ({text, BgColor, onPress}: Props) => {
   return (
         <Pressable
           onPress={onPress}
           style={({ pressed }) => [
-            styles.container,
+            [styles.container, {backgroundColor: BgColor}],
             pressed && styles.containerPressed
           ]}
           >
-            <Ionicons name={icon} size={32} color="yellow" />
             <Text style={styles.text}>{text}</Text>
         </Pressable>
   )
 }
 
-export default PressableButton
+export default BasicButton
 
 const styles = StyleSheet.create({
     container: {
@@ -33,21 +29,19 @@ const styles = StyleSheet.create({
         borderColor: "#363636",
         borderWidth: 1.5,
         borderRadius: 18,
-        flexDirection: "row",
-        width: "100%",
-        padding: 26,
-        backgroundColor: "#2e2d2d",
-        marginVertical: 8
+        padding: 16,
+        paddingHorizontal: 26,
+        width: "52%", 
+        marginHorizontal: 5
     },
     containerPressed: {
         backgroundColor: "#3a3a3a",
     },
     text: {
         textAlign: "center",
-        paddingLeft: 20,
         color: "white",
-        fontSize: 20,
-        tintColor: "#d8d8d8"
-        //font?
+        fontSize: 16,
+        tintColor: "#d8d8d8",
+        fontWeight: "bold"
     }
 })

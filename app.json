@@ -5,7 +5,9 @@
         "expo-image-picker",
         {
           "photosPermission": "The app accesses your photos to send them to analyze"
-        },
+        }
+      ],
+      [
         "expo-camera",
         {
           "cameraPermission": "Allow application to access your camera"
