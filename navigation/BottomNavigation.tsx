@@ -1,17 +1,14 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
-import CameraScreen from "../screens/CameraScreen"
+import MainScreen from "../screens/MainScreen"
 import HistoryScreen from "../screens/HistoryScreen"
 import ProfileScreen from "../screens/ProfileScreen"
 import { Ionicons } from "@expo/vector-icons"
 
+import type { TabParamList } from "../types/ParamList"
 
+const Tab = createBottomTabNavigator<TabParamList>()
 
-
-type Props = {}
-
-const Tab = createBottomTabNavigator()
-
-const AppTabs = (props: Props) => {
+const AppTabs = () => {
   return (
     <Tab.Navigator screenOptions={{
         tabBarStyle: {
@@ -28,14 +25,14 @@ const AppTabs = (props: Props) => {
         <Tab.Screen name="History" component={HistoryScreen} options={{
             title: "",
             tabBarIcon: ({color, size, focused}) => (
-                <Ionicons name="list-circle" color={focused ? "#ebb031" : "#e4dede"} size={30} />
+                <Ionicons name="list-circle-outline" color={focused ? "#ebb031" : "#e4dede"} size={30} />
             )
         }}
         />
-        <Tab.Screen name="Camera" component={CameraScreen} options={{
+        <Tab.Screen name="Main" component={MainScreen} options={{
             title: "",
             tabBarIcon: ({color, size, focused}) => (
-                <Ionicons name="camera" color={focused ? "#ebb031" : "#e4dede"} size={30} />
+                <Ionicons name="camera-outline" color={focused ? "#ebb031" : "#e4dede"} size={30} />
             )
         }}
         />
@@ -43,7 +40,7 @@ const AppTabs = (props: Props) => {
             
             title: "",
             tabBarIcon: ({color, size, focused}) => (
-                <Ionicons name="person-circle" color={focused ? "#ebb031" : "#e4dede"} size={30} />
+                <Ionicons name="person-circle-outline" color={focused ? "#ebb031" : "#e4dede"} size={30} />
             )
         }}
         />
