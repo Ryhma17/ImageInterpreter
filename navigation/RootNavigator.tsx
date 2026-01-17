@@ -4,17 +4,17 @@ import AppTabs from './BottomNavigation'
 import PreviewScreen from '../screens/PreviewScreen'
 
 import type { RootStackParamList } from '../types/ParamList'
+import CameraScreen from '../screens/CameraScreen'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
 const RootNavigator = () => {
   return (
-    <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Tabs" component={AppTabs} />
         <Stack.Screen name="Preview" component={PreviewScreen} />
+        <Stack.Screen name="Camera" component={CameraScreen} />
       </Stack.Navigator>
-    </NavigationContainer>
   )
 }
 

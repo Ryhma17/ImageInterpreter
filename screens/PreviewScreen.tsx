@@ -13,7 +13,7 @@ const PreviewScreen = ({route, navigation}: Props) => {
     const [prompt, setPrompt] = useState<string | null>(null)
 
     const onCancel = () => {
-        navigation.goBack()
+        navigation.navigate("Tabs", {screen: "Main"})
     }
 
   return (

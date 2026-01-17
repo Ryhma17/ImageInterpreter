@@ -11,5 +11,5 @@ export type RootStackParamList = {
     Tabs: NavigatorScreenParams<TabParamList>
     Preview: {image: string}
     Login: undefined
-
+    Camera: undefined
 }
