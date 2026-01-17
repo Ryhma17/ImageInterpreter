@@ -10,7 +10,7 @@ const Tab = createBottomTabNavigator<TabParamList>()
 
 const AppTabs = () => {
   return (
-    <Tab.Navigator screenOptions={{
+    <Tab.Navigator initialRouteName="Main" screenOptions={{
         tabBarStyle: {
             backgroundColor: "#2c2c2c",
             paddingTop: 9,
@@ -20,7 +20,7 @@ const AppTabs = () => {
             shadowOpacity: 0,
             shadowColor: "transparent",
         },
-        headerShown: false
+        headerShown: false,
     }}>
         <Tab.Screen name="History" component={HistoryScreen} options={{
             title: "",

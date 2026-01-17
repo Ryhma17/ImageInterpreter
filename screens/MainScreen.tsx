@@ -16,12 +16,17 @@ type Props = CompositeScreenProps<
 >
 
 const MainScreen = ({navigation}: Props) => {
+  const [opening, setOpening] = useState<boolean>(false)
 
   const OpenGalleryModal = async () => {
-    const permissionRes = await ImagePicker.requestMediaLibraryPermissionsAsync()
+    if (opening) return
+    setOpening(true)
+    try {
+      const permissionRes = await ImagePicker.requestMediaLibraryPermissionsAsync()
 
-    if (!permissionRes.granted) {
-      Alert.alert("Permission for gallery required", "Permission to access the media library is required")
+      if (!permissionRes.granted) {
+      Alert.alert("Permission for gallery required", permissionRes.canAskAgain ?
+         "Permission to access the media library is required" : "Permission denied")
       return
     }
 
@@ -32,17 +37,38 @@ const MainScreen = ({navigation}: Props) => {
       quality: 1
     })
     
-    if(!result.canceled){
-      const uri = result.assets[0].uri
+    if(result.canceled) return
+    
+      const uri = result.assets?.[0]?.uri
+      if (!uri) {
+        Alert.alert("No image selected")
+        return
+      }
+
       navigation.navigate('Preview', { image: uri })
-  }
+
+    } catch (e) {
+      Alert.alert("Failed to open gallery")
+    }
+    finally {
+      setOpening(false)
+    }
 }
+
+const openCamera = async () => {
+  const res = await ImagePicker.requestCameraPermissionsAsync()
+  if (!res.granted) {
+    Alert.alert('Camera permission required', 'Enable camera permission to take a photo.')
+    return
+  }
+  navigation.navigate("Camera")
+} 
 
 
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
       <Text style={styles.title}> New Scan</Text>
-      <PressableButton icon="camera" text='Take Photo' onPress={() => {}}/>
+      <PressableButton icon="camera" text='Take Photo' onPress={openCamera}/>
       <PressableButton icon="images" text='Chooose from Gallery' onPress={OpenGalleryModal}/>
     </SafeAreaView>
   )
