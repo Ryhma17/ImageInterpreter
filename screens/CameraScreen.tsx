@@ -4,13 +4,17 @@ import { RootStackParamList } from '../types/ParamList'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import * as ImagePicker from 'expo-image-picker'
+import { uploadFile } from '../firebase/storageService'
+import { auth } from '../firebase/Config'
 
 type Props = NativeStackScreenProps<RootStackParamList, "Camera">
 
 const CameraScreen = ({navigation}: Props) => {
   const [opening, setOpening] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [imageURL, setImageURL] = useState<string | null>(null)
   const launchedRef = useRef(false)
+  const userId = auth.currentUser?.uid
 
   const openCamera = async () => {
     try {
@@ -45,8 +49,19 @@ const CameraScreen = ({navigation}: Props) => {
         return
       }
 
-      setOpening(false)
-      navigation.navigate('Preview', { image: uri })
+      try {
+        const downloadURL = await uploadFile(uri, userId!) // imageURL palauttaa kuvan URL osoitteen, userId"!" piti käyttää non-null kun valitti muuten että undefined
+
+        console.log('upload returned URL:', downloadURL)
+
+        setImageURL(downloadURL)
+        setOpening(false)
+        navigation.navigate('Preview', { image: downloadURL })
+      } catch (uploadError) {
+        setOpening(false)
+        setError('Failed to upload image.')
+      }
+
     } catch (e) {
       setOpening(false)
       setError('Failed to open camera.')
