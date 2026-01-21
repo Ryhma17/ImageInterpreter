@@ -56,7 +56,7 @@ const CameraScreen = ({navigation}: Props) => {
 
         setImageURL(downloadURL)
         setOpening(false)
-        navigation.navigate('Preview', { image: downloadURL })
+        navigation.navigate('Preview', { image: uri })
       } catch (uploadError) {
         setOpening(false)
         setError('Failed to upload image.')

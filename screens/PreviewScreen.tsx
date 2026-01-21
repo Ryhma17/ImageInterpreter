@@ -1,32 +1,64 @@
-import { StyleSheet, Text, Image, TextInput, View } from 'react-native'
+import { StyleSheet, Text, Image, TextInput, View, Alert } from 'react-native'
 import { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import BasicButton from '../components/BasicButton'
+import { getAiAnswer } from '../firebase/AiConfig'
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import type { RootStackParamList } from '../types/ParamList'
 
+
 type Props = NativeStackScreenProps<RootStackParamList, "Preview">
 
-const PreviewScreen = ({route, navigation}: Props) => {
-    const { image } = route.params
-    const [prompt, setPrompt] = useState<string | null>(null)
+const PreviewScreen = ({ route, navigation }: Props) => {
+  const { image } = route.params
+  const [prompt, setPrompt] = useState<string | null>(null)
+  const [answer, setAnswer] = useState<string | null>(null)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
 
-    const onCancel = () => {
-        navigation.navigate("Tabs", {screen: "Main"})
+  const onCancel = () => {
+    navigation.navigate("Tabs", { screen: "Main" })
+  }
+
+  const onAnalyze = async () => {
+
+    const trimmed = (prompt ?? '').trim()
+    if (!trimmed) {
+      Alert.alert('Missing question', 'Please type a question first.')
+      return
     }
+
+    try {
+      setIsAnalyzing(true)
+      setAnswer(null)
+      const text = await getAiAnswer(image, trimmed)
+      setAnswer(text)
+    } catch (e) {
+      console.error('getAiAnswer failed:', e)
+    } finally {
+      setIsAnalyzing(false)
+    }
+  }
 
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
-      <Image source={{uri: image}} style={styles.image}/>
-      <Text style={styles.title}>Ask a question about this image:</Text>
-      <View style={styles.textInputContainer}>
-        <TextInput style={styles.text} placeholder='e.g Is this plant healthy?' placeholderTextColor="#6d6c6c" onChangeText={setPrompt} value={prompt?? ""} />
-      </View>
-      <View style={styles.buttonContainer}>
-        <BasicButton text="Cancel" onPress={onCancel} BgColor='#2c2c2c'/>
-        <BasicButton text="Analyze" onPress={() => {}} BgColor='#ffae03'/>
-      </View>
+
+      {isAnalyzing ? (
+        <Text>Loading...</Text>
+      ) : (
+        <>
+          <Image source={{ uri: image }} style={styles.image} />
+          <Text style={styles.title}>Ask a question about this image:</Text>
+          <View style={styles.textInputContainer}>
+            <TextInput style={styles.text} placeholder='e.g What is in the picture?' placeholderTextColor="#6d6c6c" onChangeText={setPrompt} value={prompt ?? ""} />
+          </View>
+          {!!answer && <Text style={styles.answer}>{answer}</Text>}
+          <View style={styles.buttonContainer}>
+            <BasicButton text="Cancel" onPress={onCancel} BgColor='#2c2c2c' />
+            <BasicButton text="Analyze" onPress={onAnalyze} BgColor='#ffae03' />
+          </View>
+        </>
+      )}
     </SafeAreaView>
   )
 }
@@ -34,7 +66,7 @@ const PreviewScreen = ({route, navigation}: Props) => {
 export default PreviewScreen
 
 const styles = StyleSheet.create({
-    safeAreaContainer: {
+  safeAreaContainer: {
     flex: 1,
     flexDirection: "column",
     backgroundColor: "#262626",
@@ -69,5 +101,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignContent: "space-evenly",
     marginHorizontal: 10
+  },
+  answer: {
+    marginTop: 14,
+    color: "#b6b6b6",
+    lineHeight: 20
   }
 })
