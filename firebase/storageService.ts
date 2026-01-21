@@ -2,8 +2,23 @@ import { storage } from './Config'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 
 //
-export const uploadFile = async (file: File, userId: string): Promise<string> => {
+export const uploadFile = async (fileOrUri: File | Blob | string, userId: string): Promise<string> => {
     try {
+        let file: File | Blob
+        let fileName: string
+
+        // Muutetaan URI -> Blob:ksi tarvittaessa
+        if (typeof fileOrUri === 'string') {
+            const response = await fetch(fileOrUri)
+            const blob = await response.blob()
+            file = blob
+            fileName = `image_${Date.now()}.jpg` // Annetaan tiedostolle nimi
+        } else {
+            file = fileOrUri
+            fileName = (fileOrUri as File).name || `image_${Date.now()}.jpg`
+        }
+
+
         // Tsekkaus että, hyväksytään yleisimmät kuvan formaatit
         const validTypes = ['image/jpeg', 'image/png', 'image/webp']
         if (!validTypes.includes(file.type)) throw new Error('Only JPEG, PNG or WEBP images are allowed')
@@ -14,7 +29,7 @@ export const uploadFile = async (file: File, userId: string): Promise<string> =>
         
         // luodaan uniikki tiedostopolku Date.now():lla
         const timeStamp = Date.now()
-        const fileRef = ref(storage, `files/${userId}/${timeStamp}_${file.name}`)
+        const fileRef = ref(storage, `files/${userId}/${timeStamp}_${fileName}`)
 
 
         const snapshot = await uploadBytes(fileRef, file)
