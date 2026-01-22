@@ -12,7 +12,7 @@ interface DetailsModalProps {
     item: {
         image: any;
         date: string;
-        location: string;
+        location: { latitude: number; longitude: number } | null;
         title: string;
         subtitle: string;
     } | null;
@@ -58,7 +58,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({ visible, onClose, onDelete,
                             {item.location ? (
                                 <Text style={styles.interpretationText}>
                                     <Text style={styles.locationLabel}>Location: </Text>
-                                    {item.location}
+                                    {item.location.latitude.toFixed(4)}, {item.location.longitude.toFixed(4)}
                                 </Text>
                             ) : null}
                             <Text style={styles.interpretationText}>{item.subtitle}</Text>

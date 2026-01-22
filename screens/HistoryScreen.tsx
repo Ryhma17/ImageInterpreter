@@ -26,7 +26,7 @@ const HistoryScreen = (props: Props) => {
       const filtered = TESTI_HISTORIA.filter(item =>
         item.title.toLowerCase().includes(lowerText) ||
         item.subtitle.toLowerCase().includes(lowerText) ||
-        item.location.toLowerCase().includes(lowerText) ||
+
         item.date.toLowerCase().includes(lowerText)
       );
       setFilteredData(filtered);

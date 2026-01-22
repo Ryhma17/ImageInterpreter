@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 interface HistoryItemProps {
   image: any;
   date: string;
-  location: string;
+  location: { latitude: number; longitude: number } | null;
   title: string;
   subtitle: string;
   onPress: () => void;
@@ -19,7 +19,7 @@ const HistoryItem: React.FC<HistoryItemProps> = ({ image, date, location, title,
       <View style={styles.infoColumn}>
         <Text style={styles.dateText}>{date}</Text>
         <Text style={styles.promptTitle}>"{title}"</Text>
-        {location ? <Text style={styles.locationText}>Location: {location}</Text> : null}
+        {location ? <Text style={styles.locationText}>Location: {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}</Text> : null}
         <Text style={styles.previewText}>{subtitle}</Text>
       </View>
 
