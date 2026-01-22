@@ -13,24 +13,24 @@ interface HistoryItemProps {
 
 const HistoryItem: React.FC<HistoryItemProps> = ({ image, date, location, title, subtitle, onPress }) => {
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress}>
+    <TouchableOpacity style={styles.itemContainer} onPress={onPress}>
       <Image source={image} style={styles.image} />
 
-      <View style={styles.textContainer}>
+      <View style={styles.infoColumn}>
         <Text style={styles.dateText}>{date}</Text>
-        <Text style={styles.locationText}>{location}</Text>
-        <Text style={styles.titleText}>{title}</Text>
-        <Text style={styles.subtitleText}>{subtitle}</Text>
+        <Text style={styles.promptTitle}>"{title}"</Text>
+        {location ? <Text style={styles.locationText}>Location: {location}</Text> : null}
+        <Text style={styles.previewText}>{subtitle}</Text>
       </View>
 
       <Ionicons name="chevron-forward" size={24} color="#666" />
-      
+
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  itemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#2C2C2C',
@@ -44,30 +44,33 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 12,
+    alignSelf: 'flex-start',
+    marginTop: 4,
   },
-  textContainer: {
+  infoColumn: {
     flex: 1,
     marginLeft: 12,
     marginRight: 8,
   },
   dateText: {
-    color: '#999',
+    color: '#d8d8d8d8',
     fontSize: 12,
     marginBottom: 4,
   },
   locationText: {
-    color: '#DDD',
-    fontSize: 12,
+    color: '#d8d8d8d8',
+    fontSize: 14,
+    lineHeight: 20,
     marginBottom: 4,
   },
-  titleText: {
+  promptTitle: {
     color: '#FFCA28',
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 2,
   },
-  subtitleText: {
-    color: '#DDD',
+  previewText: {
+    color: '#d8d8d8d8',
     fontSize: 14,
     lineHeight: 20,
   },
