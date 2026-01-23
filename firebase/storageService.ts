@@ -12,7 +12,7 @@ export const uploadFile = async (fileOrUri: File | Blob | string, userId: string
             const response = await fetch(fileOrUri)
             const blob = await response.blob()
             file = blob
-            fileName = `image_${Date.now()}.jpg` // Annetaan tiedostolle nimi
+            fileName = `image_${Date.now()}.jpg` // Annetaan tiedostolle nimi #pakottaa kaikki tiedostot .jpg päätteelle - korjaus ota tiedosto pääte itse tiedostosta.
         } else {
             file = fileOrUri
             fileName = (fileOrUri as File).name || `image_${Date.now()}.jpg`
