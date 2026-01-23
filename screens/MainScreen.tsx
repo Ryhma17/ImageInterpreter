@@ -45,7 +45,7 @@ const MainScreen = ({navigation}: Props) => {
         return
       }
 
-      navigation.navigate('Preview', { image: uri })
+      navigation.navigate('Preview', { imageLocal: uri })
 
     } catch (e) {
       Alert.alert("Failed to open gallery")

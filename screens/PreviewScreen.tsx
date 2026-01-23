@@ -6,15 +6,18 @@ import { getAiAnswer } from '../firebase/AiConfig'
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import type { RootStackParamList } from '../types/ParamList'
+import { UploadData } from '../services/dataUploadToFireStore'
+import { auth } from '../firebase/Config'
 
 
 type Props = NativeStackScreenProps<RootStackParamList, "Preview">
 
 const PreviewScreen = ({ route, navigation }: Props) => {
-  const { image } = route.params
+  const { imageLocal, imageUrl } = route.params
   const [prompt, setPrompt] = useState<string | null>(null)
   const [answer, setAnswer] = useState<string | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const userId = auth.currentUser?.uid
 
   const onCancel = () => {
     navigation.navigate("Tabs", { screen: "Main" })
@@ -29,10 +32,12 @@ const PreviewScreen = ({ route, navigation }: Props) => {
     }
 
     try {
+
       setIsAnalyzing(true)
       setAnswer(null)
-      const text = await getAiAnswer(image, trimmed)
+      const text = await getAiAnswer(imageLocal, trimmed)
       setAnswer(text)
+      await UploadData(userId!,imageUrl!,text,trimmed,21,2.12,10)
     } catch (e) {
       console.error('getAiAnswer failed:', e)
     } finally {
@@ -47,7 +52,7 @@ const PreviewScreen = ({ route, navigation }: Props) => {
         <Text>Loading...</Text>
       ) : (
         <>
-          <Image source={{ uri: image }} style={styles.image} />
+          <Image source={{ uri: imageLocal }} style={styles.image} />
           <Text style={styles.title}>Ask a question about this image:</Text>
           <View style={styles.textInputContainer}>
             <TextInput style={styles.text} placeholder='e.g What is in the picture?' placeholderTextColor="#6d6c6c" onChangeText={setPrompt} value={prompt ?? ""} />
