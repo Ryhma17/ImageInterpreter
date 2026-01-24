@@ -10,8 +10,10 @@ const UploadData = async (
     imageUrl: string,
     aiAnswer: string,
     userPrompt: string,
-    lat?: number,
-    lng?: number,
+    location?: {
+        lattitude: number,
+        longitude: number
+    },
     rating?: number
 ) => {
     try {
@@ -20,16 +22,14 @@ const UploadData = async (
         const usageDocRef = doc(usageColRef, "allTime")
 
         const docRef = await addDoc(historyRef, {
-            imageUrl,
-            prompt: userPrompt,
-            answer: aiAnswer,
-            latitude: lat,
-            longitude: lng,
-            rating,
-            timestamp: Timestamp.now()
+            "image": imageUrl,
+            "prompt": userPrompt,
+            "answer": aiAnswer,
+            "location": location ?? null,
+            "rating": rating ?? null,
+            "timestamp": Timestamp.now()
         })
 
-        console.log("usageDocRef:", usageDocRef.path)
         await runTransaction(db, async (tx) => {
            tx.set(usageDocRef,
             {
@@ -40,7 +40,7 @@ const UploadData = async (
            )
         })
         
-        return docRef
+        return Timestamp.now()
     } catch (error) {
         console.log(error)
         throw error

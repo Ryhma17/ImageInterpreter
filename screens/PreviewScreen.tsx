@@ -1,5 +1,5 @@
-import { StyleSheet, Text, Image, TextInput, View, Alert } from 'react-native'
-import { useState } from 'react'
+import { StyleSheet, Text, Image, TextInput, View, Alert, ActivityIndicator } from 'react-native'
+import { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import BasicButton from '../components/BasicButton'
 import { getAiAnswer } from '../firebase/AiConfig'
@@ -7,7 +7,8 @@ import { getAiAnswer } from '../firebase/AiConfig'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import type { RootStackParamList } from '../types/ParamList'
 import { UploadData } from '../services/dataUploadToFireStore'
-import { auth } from '../firebase/Config'
+import { auth, Timestamp } from '../firebase/Config'
+import DetailsModal from '../components/DetailsModal'
 
 
 type Props = NativeStackScreenProps<RootStackParamList, "Preview">
@@ -16,8 +17,18 @@ const PreviewScreen = ({ route, navigation }: Props) => {
   const { imageLocal, imageUrl } = route.params
   const [prompt, setPrompt] = useState<string | null>(null)
   const [answer, setAnswer] = useState<string | null>(null)
+  const [uploadedAt, setUploadedAt] = useState<Timestamp | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [showModal, setShowModal] = useState(false)
+  const [navigateAfterClose, setNavigateAfterClose] = useState(false)
   const userId = auth.currentUser?.uid
+
+  useEffect(() => {
+    if (!showModal && navigateAfterClose) {
+      setNavigateAfterClose(false)
+      navigation.navigate("Tabs", { screen: "History" })
+    }
+  }, [showModal, navigateAfterClose, navigation])
 
   const onCancel = () => {
     navigation.navigate("Tabs", { screen: "Main" })
@@ -32,12 +43,16 @@ const PreviewScreen = ({ route, navigation }: Props) => {
     }
 
     try {
-
       setIsAnalyzing(true)
       setAnswer(null)
       const text = await getAiAnswer(imageLocal, trimmed)
       setAnswer(text)
-      await UploadData(userId!,imageUrl!,text,trimmed,21,2.12,10)
+      const uploaded = await UploadData(userId!,imageUrl!,text,trimmed,{lattitude: 3, longitude: 1})
+      setUploadedAt(uploaded)
+      if (uploaded) {
+        setNavigateAfterClose(true)
+        setShowModal(true)
+      }
     } catch (e) {
       console.error('getAiAnswer failed:', e)
     } finally {
@@ -47,23 +62,30 @@ const PreviewScreen = ({ route, navigation }: Props) => {
 
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
+      <DetailsModal 
+        visible={showModal}
+        item={{image: { uri: imageLocal}, title: prompt!, subtitle: answer!, date: uploadedAt!}}
+        onClose={() => setShowModal(false)}/>
+      {isAnalyzing ? 
+        <View style={styles.loading}>
+          <ActivityIndicator size='large' color="#FF6F00" />
+        </View> : null}
 
-      {isAnalyzing ? (
-        <Text>Loading...</Text>
-      ) : (
-        <>
           <Image source={{ uri: imageLocal }} style={styles.image} />
           <Text style={styles.title}>Ask a question about this image:</Text>
           <View style={styles.textInputContainer}>
-            <TextInput style={styles.text} placeholder='e.g What is in the picture?' placeholderTextColor="#6d6c6c" onChangeText={setPrompt} value={prompt ?? ""} />
+            <TextInput
+             style={styles.text}
+             placeholder='e.g What is in the picture?'
+             placeholderTextColor="#6d6c6c"
+             onChangeText={setPrompt}
+             value={prompt ?? ""}
+             editable={!isAnalyzing} />
           </View>
-          {!!answer && <Text style={styles.answer}>{answer}</Text>}
           <View style={styles.buttonContainer}>
             <BasicButton text="Cancel" onPress={onCancel} BgColor='#2c2c2c' />
             <BasicButton text="Analyze" onPress={onAnalyze} BgColor='#ffae03' />
           </View>
-        </>
-      )}
     </SafeAreaView>
   )
 }
@@ -111,5 +133,16 @@ const styles = StyleSheet.create({
     marginTop: 14,
     color: "#b6b6b6",
     lineHeight: 20
+  },
+  loading: {
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: "#14141479"
   }
 })

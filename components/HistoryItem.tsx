@@ -1,10 +1,11 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Timestamp } from '../firebase/Config';
 
 interface HistoryItemProps {
   image: any;
-  date: string;
+  date: Timestamp;
   location: { latitude: number; longitude: number } | null;
   title: string;
   subtitle: string;
@@ -12,12 +13,12 @@ interface HistoryItemProps {
 }
 
 const HistoryItem: React.FC<HistoryItemProps> = ({ image, date, location, title, subtitle, onPress }) => {
+  const formattedDate = date ? date.toDate().toLocaleString() : '';
   return (
     <TouchableOpacity style={styles.itemContainer} onPress={onPress}>
       <Image source={image} style={styles.image} />
-
       <View style={styles.infoColumn}>
-        <Text style={styles.dateText}>{date}</Text>
+        <Text style={styles.dateText}>{formattedDate}</Text>
         <Text style={styles.promptTitle}>"{title}"</Text>
         {location ? <Text style={styles.locationText}>Location: {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}</Text> : null}
         <Text style={styles.previewText}>{subtitle}</Text>

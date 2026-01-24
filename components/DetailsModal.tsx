@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, Modal, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Timestamp } from '../firebase/Config';
 
 
 const { width } = Dimensions.get('window');
@@ -11,8 +12,8 @@ interface DetailsModalProps {
     onDelete?: () => void;
     item: {
         image: any;
-        date: string;
-        location: { latitude: number; longitude: number } | null;
+        date?: Timestamp;
+        location?: { latitude: number; longitude: number } | null;
         title: string;
         subtitle: string;
     } | null;
@@ -20,7 +21,7 @@ interface DetailsModalProps {
 
 const DetailsModal: React.FC<DetailsModalProps> = ({ visible, onClose, onDelete, item }) => {
     if (!item) return null;
-
+    const formattedDate = item.date ? item.date.toDate().toLocaleString() : '';
     return (
         <Modal
             animationType="slide"
@@ -46,7 +47,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({ visible, onClose, onDelete,
 
                         <View style={styles.detailsContent}>
                             <View style={styles.dateContainer}>
-                                <Text style={styles.dateText}>{item.date}</Text>
+                                <Text style={styles.dateText}>{formattedDate}</Text>
                             </View>
 
                             <Text style={styles.promptTitle}>"{item.title}"</Text>
