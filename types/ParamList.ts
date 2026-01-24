@@ -9,7 +9,7 @@ export type TabParamList = {
 
 export type RootStackParamList = {
     Tabs: NavigatorScreenParams<TabParamList>
-    Preview: {image: string}
+    Preview: {imageLocal: string, imageUrl?: string }
     Login: undefined
     Camera: undefined
 }

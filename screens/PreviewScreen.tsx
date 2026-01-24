@@ -1,32 +1,91 @@
-import { StyleSheet, Text, Image, TextInput, View } from 'react-native'
-import { useState } from 'react'
+import { StyleSheet, Text, Image, TextInput, View, Alert, ActivityIndicator } from 'react-native'
+import { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import BasicButton from '../components/BasicButton'
+import { getAiAnswer } from '../firebase/AiConfig'
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import type { RootStackParamList } from '../types/ParamList'
+import { UploadData } from '../services/dataUploadToFireStore'
+import { auth, Timestamp } from '../firebase/Config'
+import DetailsModal from '../components/DetailsModal'
+
 
 type Props = NativeStackScreenProps<RootStackParamList, "Preview">
 
-const PreviewScreen = ({route, navigation}: Props) => {
-    const { image } = route.params
-    const [prompt, setPrompt] = useState<string | null>(null)
+const PreviewScreen = ({ route, navigation }: Props) => {
+  const { imageLocal, imageUrl } = route.params
+  const [prompt, setPrompt] = useState<string | null>(null)
+  const [answer, setAnswer] = useState<string | null>(null)
+  const [uploadedAt, setUploadedAt] = useState<Timestamp | null>(null)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [showModal, setShowModal] = useState(false)
+  const [navigateAfterClose, setNavigateAfterClose] = useState(false)
+  const userId = auth.currentUser?.uid
 
-    const onCancel = () => {
-        navigation.navigate("Tabs", {screen: "Main"})
+  useEffect(() => {
+    if (!showModal && navigateAfterClose) {
+      setNavigateAfterClose(false)
+      navigation.navigate("Tabs", { screen: "History" })
     }
+  }, [showModal, navigateAfterClose, navigation])
+
+  const onCancel = () => {
+    navigation.navigate("Tabs", { screen: "Main" })
+  }
+
+  const onAnalyze = async () => {
+
+    const trimmed = (prompt ?? '').trim()
+    if (!trimmed) {
+      Alert.alert('Missing question', 'Please type a question first.')
+      return
+    }
+
+    try {
+      setIsAnalyzing(true)
+      setAnswer(null)
+      const text = await getAiAnswer(imageLocal, trimmed)
+      setAnswer(text)
+      const uploaded = await UploadData(userId!,imageUrl!,text,trimmed,{lattitude: 3, longitude: 1})
+      setUploadedAt(uploaded)
+      if (uploaded) {
+        setNavigateAfterClose(true)
+        setShowModal(true)
+      }
+    } catch (e) {
+      console.error('getAiAnswer failed:', e)
+    } finally {
+      setIsAnalyzing(false)
+    }
+  }
 
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
-      <Image source={{uri: image}} style={styles.image}/>
-      <Text style={styles.title}>Ask a question about this image:</Text>
-      <View style={styles.textInputContainer}>
-        <TextInput style={styles.text} placeholder='e.g Is this plant healthy?' placeholderTextColor="#6d6c6c" onChangeText={setPrompt} value={prompt?? ""} />
-      </View>
-      <View style={styles.buttonContainer}>
-        <BasicButton text="Cancel" onPress={onCancel} BgColor='#2c2c2c'/>
-        <BasicButton text="Analyze" onPress={() => {}} BgColor='#ffae03'/>
-      </View>
+      <DetailsModal 
+        visible={showModal}
+        item={{image: { uri: imageLocal}, title: prompt!, subtitle: answer!, date: uploadedAt!}}
+        onClose={() => setShowModal(false)}/>
+      {isAnalyzing ? 
+        <View style={styles.loading}>
+          <ActivityIndicator size='large' color="#FF6F00" />
+        </View> : null}
+
+          <Image source={{ uri: imageLocal }} style={styles.image} />
+          <Text style={styles.title}>Ask a question about this image:</Text>
+          <View style={styles.textInputContainer}>
+            <TextInput
+             style={styles.text}
+             placeholder='e.g What is in the picture?'
+             placeholderTextColor="#6d6c6c"
+             onChangeText={setPrompt}
+             value={prompt ?? ""}
+             editable={!isAnalyzing} />
+          </View>
+          <View style={styles.buttonContainer}>
+            <BasicButton text="Cancel" onPress={onCancel} BgColor='#2c2c2c' />
+            <BasicButton text="Analyze" onPress={onAnalyze} BgColor='#ffae03' />
+          </View>
     </SafeAreaView>
   )
 }
@@ -34,7 +93,7 @@ const PreviewScreen = ({route, navigation}: Props) => {
 export default PreviewScreen
 
 const styles = StyleSheet.create({
-    safeAreaContainer: {
+  safeAreaContainer: {
     flex: 1,
     flexDirection: "column",
     backgroundColor: "#262626",
@@ -69,5 +128,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignContent: "space-evenly",
     marginHorizontal: 10
+  },
+  answer: {
+    marginTop: 14,
+    color: "#b6b6b6",
+    lineHeight: 20
+  },
+  loading: {
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: "#14141479"
   }
 })
