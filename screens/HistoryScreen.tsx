@@ -23,11 +23,25 @@ const HistoryScreen = (props: Props) => {
   useEffect(() => {
     if (searchText) {
       const lowerText = searchText.toLowerCase();
-      const filtered = TESTI_HISTORIA.filter(item =>
-        item.title.toLowerCase().includes(lowerText) ||
-        item.subtitle.toLowerCase().includes(lowerText) ||
 
-        item.date.toLowerCase().includes(lowerText)
+      const dateToSearchText = (dateValue: any) => {
+        if (!dateValue) return '';
+        if (typeof dateValue === 'string') return dateValue;
+        if (dateValue instanceof Date) return dateValue.toLocaleString();
+        if (typeof dateValue?.toDate === 'function') {
+          try {
+            return dateValue.toDate().toLocaleString();
+          } catch {
+            return '';
+          }
+        }
+        return String(dateValue);
+      };
+
+      const filtered = TESTI_HISTORIA.filter(item =>
+        (item.title ?? '').toLowerCase().includes(lowerText) ||
+        (item.subtitle ?? '').toLowerCase().includes(lowerText) ||
+        dateToSearchText(item.date).toLowerCase().includes(lowerText)
       );
       setFilteredData(filtered);
     } else {
