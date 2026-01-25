@@ -14,7 +14,6 @@ const CameraScreen = ({navigation}: Props) => {
   const [error, setError] = useState<string | null>(null)
   const [imageURL, setImageURL] = useState<string | null>(null)
   const launchedRef = useRef(false)
-  const userId = auth.currentUser?.uid
 
   const openCamera = async () => {
     try {
@@ -50,13 +49,8 @@ const CameraScreen = ({navigation}: Props) => {
       }
 
       try {
-        const downloadURL = await uploadFile(uri, userId!) // imageURL palauttaa kuvan URL osoitteen, userId"!" piti käyttää non-null kun valitti muuten että undefined
-
-        console.log('upload returned URL:', downloadURL)
-
-        setImageURL(downloadURL)
         setOpening(false)
-        navigation.navigate('Preview', { imageLocal: uri, imageUrl: downloadURL })
+        navigation.navigate('Preview', { imageLocal: uri })
       } catch (uploadError) {
         setOpening(false)
         setError('Failed to upload image.')
