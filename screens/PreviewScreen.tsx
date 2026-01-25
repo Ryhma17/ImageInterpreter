@@ -9,12 +9,16 @@ import type { RootStackParamList } from '../types/ParamList'
 import { UploadData } from '../services/dataUploadToFireStore'
 import { auth, Timestamp } from '../firebase/Config'
 import DetailsModal from '../components/DetailsModal'
+import { uploadFile } from '../firebase/storageService'
+import {  getLocalImages, saveImagesLocally } from '..//services/localStorageService'
 
 
 type Props = NativeStackScreenProps<RootStackParamList, "Preview">
 
 const PreviewScreen = ({ route, navigation }: Props) => {
-  const { imageLocal, imageUrl } = route.params
+  const { imageLocal } = route.params
+  const [imageUrl, setImageUrl] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
   const [prompt, setPrompt] = useState<string | null>(null)
   const [answer, setAnswer] = useState<string | null>(null)
   const [uploadedAt, setUploadedAt] = useState<Timestamp | null>(null)
@@ -29,6 +33,32 @@ const PreviewScreen = ({ route, navigation }: Props) => {
       navigation.navigate("Tabs", { screen: "History" })
     }
   }, [showModal, navigateAfterClose, navigation])
+
+  useEffect(() => { // 
+    const uploadImageToCloud = async () => {
+      if (!userId || imageUrl) return
+
+      try {
+        setUploading(true)
+        
+        // firebase cloud storageen tallennus
+        const downloadURL = await uploadFile(imageLocal, userId)
+        setImageUrl(downloadURL)
+        
+        // local storageen tallennus
+        await saveImagesLocally({ localUri: imageLocal, cloudUrl: downloadURL, timestamp: Date.now() })
+        
+      } catch (error) {
+        console.error('Failed to upload image:', error)
+        Alert.alert('Upload failed', 'Please try again later.') 
+      } finally {
+        setUploading(false)
+      }
+    }
+    
+    uploadImageToCloud()
+  }, [imageLocal, userId])
+  
 
   const onCancel = () => {
     navigation.navigate("Tabs", { screen: "Main" })
