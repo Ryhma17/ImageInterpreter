@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, Modal, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Image, Modal, TouchableOpacity, ScrollView, Dimensions, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Timestamp } from '../firebase/Config';
 
@@ -28,6 +28,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({ visible, onClose, onDelete,
             transparent={true}
             visible={visible}
             onRequestClose={onClose}
+            statusBarTranslucent={true}
         >
             <View style={styles.centeredView}>
                 <View style={styles.modalView}>

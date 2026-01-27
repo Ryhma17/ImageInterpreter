@@ -91,7 +91,7 @@ const HistoryScreen = (props: Props) => {
   });
 
   return (
-    <SafeAreaView style={styles.safeAreaContainer}>
+    <SafeAreaView style={styles.safeAreaContainer} edges={['top', 'left', 'right']}>
       <View style={styles.headerContainer}>
         <Animated.Text style={[styles.title, { opacity: titleOpacity }]}>
           History
@@ -123,6 +123,7 @@ const HistoryScreen = (props: Props) => {
 
       <FlatList
         data={filteredData}
+        style={styles.flatList}
         contentContainerStyle={styles.contentContainer}
         renderItem={({ item }) => (
           <HistoryItem
@@ -195,6 +196,10 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 16,
+    paddingBottom: 80,
     backgroundColor: "#262626"
+  },
+  flatList: {
+    flex: 1,
   },
 })
