@@ -16,12 +16,15 @@ const HistoryItem: React.FC<HistoryItemProps> = ({ image, date, location, title,
   const formattedDate = date ? date.toDate().toLocaleString() : '';
   return (
     <TouchableOpacity style={styles.itemContainer} onPress={onPress}>
-      <Image source={image} style={styles.image} />
+      {image ? <Image source={image} style={styles.image} /> : <View style={styles.image} />}
       <View style={styles.infoColumn}>
         <Text style={styles.dateText}>{formattedDate}</Text>
         <Text style={styles.promptTitle}>"{title}"</Text>
         {location ? <Text style={styles.locationText}>Location: {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}</Text> : null}
-        <Text style={styles.previewText}>{subtitle}</Text>
+        <Text style={styles.previewText}
+        numberOfLines={2}
+        ellipsizeMode="tail"
+        >{subtitle}</Text>
       </View>
 
       <Ionicons name="chevron-forward" size={24} color="#666" />
