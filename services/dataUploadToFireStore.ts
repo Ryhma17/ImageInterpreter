@@ -5,10 +5,6 @@ const UploadData = async (
     imageUrl: string,
     aiAnswer: string,
     userPrompt: string,
-    location?: {
-        lattitude: number,
-        longitude: number
-    },
     rating?: number
 ) => {
     try {
@@ -16,28 +12,29 @@ const UploadData = async (
         const usageColRef = collection(db, "data", userId, "usage")
         const usageDocRef = doc(usageColRef, "allTime")
         
-        // parse location func here
+        const location = await parseLocation(aiAnswer)
+        const timeNow = Timestamp.now()
 
         const docRef = await addDoc(historyRef, {
             "image": imageUrl,
             "prompt": userPrompt,
-            "answer": aiAnswer,
-            "location": location ?? null,
+            "answer": location?.cleaned ?? aiAnswer,
+            "location": location?.location ?? null,
             "rating": rating ?? null,
-            "timestamp": Timestamp.now()
+            "timestamp": timeNow
         })
 
         await runTransaction(db, async (tx) => {
            tx.set(usageDocRef,
             {
                 total: increment(1),
-                updatedAt: Timestamp.now()
+                updatedAt: timeNow
             },
             { merge: true }
            )
         })
         
-        return Timestamp.now()
+        return {timeNow, location}
     } catch (error) {
         console.log(error)
         throw error
@@ -45,4 +42,14 @@ const UploadData = async (
 
 }
 
-export { UploadData }
+const parseLocation = async (aiAnswer: string) => {
+    const match = aiAnswer.match(/Location:\s*{\s*Latitude:\s*([-\d.]+)\s*,?\s*Longitude:\s*([-\d.]+)\s*}/i)
+    if (!match) return
+    const location = {latitude: Number(match[1]), longitude: Number(match[2])}
+    console.log(location)
+
+    const cleaned = aiAnswer.replace(/Location:\s*{\s*[\s\S]*?\s*}/i,'').trim();
+    return {location, cleaned}
+}
+
+export { UploadData, parseLocation }

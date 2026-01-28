@@ -1,6 +1,6 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
-import { RootStackParamList } from '../types/ParamList'
+import { RootStackParamList } from '../types/ParamListTypes'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import * as ImagePicker from 'expo-image-picker'

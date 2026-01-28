@@ -4,7 +4,7 @@ import HistoryScreen from "../screens/HistoryScreen"
 import ProfileScreen from "../screens/ProfileScreen"
 import { Ionicons } from "@expo/vector-icons"
 
-import type { TabParamList } from "../types/ParamList"
+import type { TabParamList } from "../types/ParamListTypes"
 
 const Tab = createBottomTabNavigator<TabParamList>()
 

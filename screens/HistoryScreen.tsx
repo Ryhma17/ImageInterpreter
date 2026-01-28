@@ -6,11 +6,20 @@ import DetailsModal from '../components/DetailsModal'
 import { TESTI_HISTORIA } from '../testData/testiHistoriaa'
 import { Ionicons } from '@expo/vector-icons'
 
-type Props = {}
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
+import { CommonActions } from '@react-navigation/native'
+import type { CompositeScreenProps } from '@react-navigation/native'
+import type { NativeStackScreenProps } from '@react-navigation/native-stack'
+import type { RootStackParamList, TabParamList } from '../types/ParamListTypes'
+
+type Props = CompositeScreenProps<
+  BottomTabScreenProps<TabParamList, 'History'>,
+  NativeStackScreenProps<RootStackParamList>
+>
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
-const HistoryScreen = (props: Props) => {
+const HistoryScreen = ({ navigation }: Props) => {
   const [searchText, setSearchText] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchAnim = useRef(new Animated.Value(0)).current;
@@ -141,6 +150,18 @@ const HistoryScreen = (props: Props) => {
       <DetailsModal
         visible={modalVisible}
         onClose={closeModal}
+        onOpenMap={(loc) => {
+          closeModal()
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 1,
+              routes: [
+                { name: 'Tabs', params: { screen: 'History' } },
+                { name: 'Map', params: { location: loc } },
+              ],
+            })
+          )
+        }}
         item={selectedItem}
       />
     </SafeAreaView>

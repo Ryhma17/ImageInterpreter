@@ -5,8 +5,9 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import AppTabs from './navigation/BottomNavigation';
 import LoginScreen from './screens/LoginScreen';
 import PreviewScreen from './screens/PreviewScreen';
+import MapScreen from './screens/MapScreen';
 
-import type { RootStackParamList } from './types/ParamList';
+import type { RootStackParamList } from './types/ParamListTypes';
 import CameraScreen from './screens/CameraScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -29,6 +30,7 @@ const RootNavigator = () => {
           <>
             <Stack.Screen name="Tabs" component={AppTabs} />
             <Stack.Screen name="Preview" component={PreviewScreen} />
+            <Stack.Screen name="Map" component={MapScreen} />
             <Stack.Screen name="Camera" component={CameraScreen} />
           </>
         ) : (
