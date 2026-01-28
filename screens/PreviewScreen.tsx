@@ -3,14 +3,16 @@ import { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import BasicButton from '../components/BasicButton'
 import { getAiAnswer } from '../firebase/AiConfig'
-
-import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import type { RootStackParamList } from '../types/ParamList'
-import { UploadData } from '../services/dataUploadToFireStore'
+import { UploadData, parseLocation } from '../services/dataUploadToFireStore'
 import { auth, Timestamp } from '../firebase/Config'
 import DetailsModal from '../components/DetailsModal'
 import { uploadFile } from '../firebase/storageService'
 import {  getLocalImages, saveImagesLocally } from '..//services/localStorageService'
+
+import { CommonActions } from '@react-navigation/native'
+import type { NativeStackScreenProps } from '@react-navigation/native-stack'
+import type { RootStackParamList } from '../types/ParamListTypes'
+import type { location } from '../types/locationTypes'
 
 
 type Props = NativeStackScreenProps<RootStackParamList, "Preview">
@@ -19,6 +21,7 @@ const PreviewScreen = ({ route, navigation }: Props) => {
   const { imageLocal } = route.params
   const [imageUrl, setImageUrl] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
+  const [location, setLocation] = useState<location | null>(null)
   const [prompt, setPrompt] = useState<string | null>(null)
   const [answer, setAnswer] = useState<string | null>(null)
   const [uploadedAt, setUploadedAt] = useState<Timestamp | null>(null)
@@ -34,7 +37,7 @@ const PreviewScreen = ({ route, navigation }: Props) => {
     }
   }, [showModal, navigateAfterClose, navigation])
 
-  useEffect(() => { // 
+  useEffect(() => {
     const uploadImageToCloud = async () => {
       if (!userId || imageUrl) return
 
@@ -76,9 +79,11 @@ const PreviewScreen = ({ route, navigation }: Props) => {
       setIsAnalyzing(true)
       setAnswer(null)
       const text = await getAiAnswer(imageLocal, trimmed)
-      setAnswer(text)
-      const uploaded = await UploadData(userId!,imageUrl!,text,trimmed,{lattitude: 3, longitude: 1})
-      setUploadedAt(uploaded)
+      const parsedTextandLocation = await parseLocation(text)
+      setAnswer(parsedTextandLocation?.cleaned ?? text)
+      setLocation(parsedTextandLocation?.location ?? null)
+      const uploaded = await UploadData(userId!,imageUrl!,text,trimmed)
+      setUploadedAt(uploaded.timeNow)
       if (uploaded) {
         setNavigateAfterClose(true)
         setShowModal(true)
@@ -94,7 +99,20 @@ const PreviewScreen = ({ route, navigation }: Props) => {
     <SafeAreaView style={styles.safeAreaContainer}>
       <DetailsModal 
         visible={showModal}
-        item={{image: { uri: imageLocal}, title: prompt!, subtitle: answer!, date: uploadedAt!}}
+        item={{image: { uri: imageLocal}, title: prompt!, subtitle: answer!, date: uploadedAt!, location: location}}
+        onOpenMap={(loc) => {
+          setNavigateAfterClose(false)
+          setShowModal(false)
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 1,
+              routes: [
+                { name: 'Tabs', params: { screen: 'History' } },
+                { name: 'Map', params: { location: loc } },
+              ],
+            })
+          )
+        }}
         onClose={() => setShowModal(false)}/>
       {isAnalyzing ? 
         <View style={styles.loading}>
