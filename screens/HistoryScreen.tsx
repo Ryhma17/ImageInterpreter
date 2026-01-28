@@ -1,14 +1,28 @@
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, TextInput, Animated, Dimensions } from 'react-native'
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, TextInput, Animated, Dimensions, ActivityIndicator } from 'react-native'
 import React, { useState, useRef, useEffect } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import HistoryItem from '../components/HistoryItem'
 import DetailsModal from '../components/DetailsModal'
-import { TESTI_HISTORIA } from '../testData/testiHistoriaa'
+// import { TESTI_HISTORIA } from '../testData/testiHistoriaa'
 import { Ionicons } from '@expo/vector-icons'
+import { auth, db, collection, Timestamp } from '../firebase/Config'
+import { onSnapshot, query, orderBy } from 'firebase/firestore'
 
 type Props = {}
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
+
+interface HistoryDataItem {
+  id: string;
+  image: any;
+  date: Timestamp;
+  location: {
+    latitude: number;
+    longitude: number;
+  } | null;
+  title: string;
+  subtitle: string;
+}
 
 const HistoryScreen = (props: Props) => {
   const [searchText, setSearchText] = useState('');
@@ -16,38 +30,74 @@ const HistoryScreen = (props: Props) => {
   const searchAnim = useRef(new Animated.Value(0)).current;
   const inputRef = useRef<TextInput>(null);
 
-  const [filteredData, setFilteredData] = useState(TESTI_HISTORIA);
+  const [historyData, setHistoryData] = useState<HistoryDataItem[]>([]);
+  const [filteredData, setFilteredData] = useState<HistoryDataItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [modalVisible, setModalVisible] = useState(false);
+
+  useEffect(() => {
+    const userId = auth.currentUser?.uid;
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
+
+    const q = query(collection(db, "data", userId, "history"), orderBy("timestamp", "desc"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const items: HistoryDataItem[] = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+
+        let loc = null;
+        if (data.location) {
+          loc = {
+            latitude: data.location.lattitude || 0,
+            longitude: data.location.longitude || 0
+          };
+        }
+
+        items.push({
+          id: doc.id,
+          image: data.image ? { uri: data.image } : null,
+          date: data.timestamp,
+          location: loc,
+          title: data.prompt || "No Title",
+          subtitle: data.answer || "No description available",
+        });
+      });
+      setHistoryData(items);
+      setFilteredData(items);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching history:", error);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     if (searchText) {
       const lowerText = searchText.toLowerCase();
 
-      const dateToSearchText = (dateValue: any) => {
-        if (!dateValue) return '';
-        if (typeof dateValue === 'string') return dateValue;
-        if (dateValue instanceof Date) return dateValue.toLocaleString();
-        if (typeof dateValue?.toDate === 'function') {
-          try {
-            return dateValue.toDate().toLocaleString();
-          } catch {
-            return '';
-          }
-        }
-        return String(dateValue);
+      const dateToSearchText = (timestamp: Timestamp) => {
+        if (!timestamp) return '';
+        return timestamp.toDate().toLocaleString();
       };
 
-      const filtered = TESTI_HISTORIA.filter(item =>
+      const filtered = historyData.filter(item =>
         (item.title ?? '').toLowerCase().includes(lowerText) ||
         (item.subtitle ?? '').toLowerCase().includes(lowerText) ||
-        dateToSearchText(item.date).toLowerCase().includes(lowerText)
+        dateToSearchText(item.date).toLowerCase().includes(lowerText) ||
+        (item.location && `${item.location.latitude.toFixed(4)}, ${item.location.longitude.toFixed(4)}`.includes(lowerText))
       );
       setFilteredData(filtered);
     } else {
-      setFilteredData(TESTI_HISTORIA);
+      setFilteredData(historyData);
     }
-  }, [searchText]);
+  }, [searchText, historyData]);
 
   const toggleSearch = () => {
     if (isSearchOpen) {
@@ -121,22 +171,28 @@ const HistoryScreen = (props: Props) => {
         </View>
       </View>
 
-      <FlatList
-        data={filteredData}
-        style={styles.flatList}
-        contentContainerStyle={styles.contentContainer}
-        renderItem={({ item }) => (
-          <HistoryItem
-            image={item.image}
-            date={item.date}
-            location={item.location}
-            title={item.title}
-            subtitle={item.subtitle}
-            onPress={() => openModal(item)}
-          />
-        )}
-        keyExtractor={(item) => item.id}
-      />
+      {loading ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#FFCA28" />
+        </View>
+      ) : (
+        <FlatList
+          data={filteredData}
+          style={styles.flatList}
+          contentContainerStyle={styles.contentContainer}
+          renderItem={({ item }) => (
+            <HistoryItem
+              image={item.image}
+              date={item.date}
+              location={item.location}
+              title={item.title}
+              subtitle={item.subtitle}
+              onPress={() => openModal(item)}
+            />
+          )}
+          keyExtractor={(item) => item.id}
+        />
+      )}
 
       <DetailsModal
         visible={modalVisible}
