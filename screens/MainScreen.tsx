@@ -37,11 +37,15 @@ const MainScreen = ({navigation}: Props) => {
       quality: 1
     })
     
-    if(result.canceled) return
+    if(result.canceled) {
+      setOpening(false)
+      return
+    }
     
       const uri = result.assets?.[0]?.uri
       if (!uri) {
         Alert.alert("No image selected")
+        setOpening(false)
         return
       }
 
@@ -49,9 +53,6 @@ const MainScreen = ({navigation}: Props) => {
 
     } catch (e) {
       Alert.alert("Failed to open gallery")
-    }
-    finally {
-      setOpening(false)
     }
 }
 
