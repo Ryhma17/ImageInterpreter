@@ -1,10 +1,5 @@
 import { db, addDoc, collection, Timestamp, runTransaction, increment, doc  } from "../firebase/Config"
 
-
-// Functions for uploading info to firestore
-// Gets user id, image url, checks for map coordinates, parses Ai answer and saves user prompt.
-// Later add, values for how good answer was to track data and show graphs.
-
 const UploadData = async (
     userId: string,
     imageUrl: string,
@@ -20,6 +15,8 @@ const UploadData = async (
         const historyRef = collection(db, "data", userId, "history")
         const usageColRef = collection(db, "data", userId, "usage")
         const usageDocRef = doc(usageColRef, "allTime")
+        
+        // parse location func here
 
         const docRef = await addDoc(historyRef, {
             "image": imageUrl,
@@ -48,4 +45,4 @@ const UploadData = async (
 
 }
 
-export {UploadData}
+export { UploadData }
