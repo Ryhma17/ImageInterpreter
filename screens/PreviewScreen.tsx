@@ -12,7 +12,7 @@ import {  getLocalImages, saveImagesLocally } from '..//services/localStorageSer
 import { CommonActions } from '@react-navigation/native'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import type { RootStackParamList } from '../types/ParamListTypes'
-import type { location } from '../types/locationTypes'
+import type { location } from '../types/LocationTypes'
 
 
 type Props = NativeStackScreenProps<RootStackParamList, "Preview">

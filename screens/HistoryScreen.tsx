@@ -62,7 +62,7 @@ const HistoryScreen = ({ navigation }: Props) => {
         let loc = null;
         if (data.location) {
           loc = {
-            latitude: data.location.lattitude || 0,
+            latitude: data.location.latitude || 0,
             longitude: data.location.longitude || 0
           };
         }
