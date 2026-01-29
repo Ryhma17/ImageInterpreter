@@ -1,5 +1,5 @@
 import type { NavigatorScreenParams } from '@react-navigation/native'
-import type { location } from './locationTypes'
+import type { location } from './LocationTypes'
 
 export type TabParamList = {
   History: undefined
