@@ -7,7 +7,7 @@ import * as ImagePicker from 'expo-image-picker'
 import type { CompositeScreenProps } from '@react-navigation/native'
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import type { RootStackParamList, TabParamList } from '../types/ParamList'
+import type { RootStackParamList, TabParamList } from '../types/ParamListTypes'
 
 
 type Props = CompositeScreenProps<
@@ -37,11 +37,15 @@ const MainScreen = ({navigation}: Props) => {
       quality: 1
     })
     
-    if(result.canceled) return
+    if(result.canceled) {
+      setOpening(false)
+      return
+    }
     
       const uri = result.assets?.[0]?.uri
       if (!uri) {
         Alert.alert("No image selected")
+        setOpening(false)
         return
       }
 
@@ -49,9 +53,6 @@ const MainScreen = ({navigation}: Props) => {
 
     } catch (e) {
       Alert.alert("Failed to open gallery")
-    }
-    finally {
-      setOpening(false)
     }
 }
 

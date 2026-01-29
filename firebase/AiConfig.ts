@@ -1,17 +1,19 @@
-import '../types/abortsignal'
+import "../types/abortsignal"
 import { File } from 'expo-file-system'
 import { getAI, getGenerativeModel, GoogleAIBackend } from 'firebase/ai'
-import type { GenerativePart} from '../types/AiResponse'
+import type { GenerativePart} from '../types/AiResponseTypes'
 import { app } from './Config'
 
 const systemPrompt = `1. Only answer if the user input is a clear question AND it is directly relevant to the given image.
                       2. If the input is not a question, or the question is not relevant to the image, do NOT answer it. Instead, provide neutral, factual, general information describing what is visible in the image.
                       3. Never hallucinate details that are not visible or cannot be reasonably inferred from the image.
-                      4. If the user asks about the location shown in the image:
+                      4. If the user asks about the location of the photo or where something in the pohoto is:
                         - Provide your best estimate.
                         - Append latitude and longitude at the very end of the response in this format:
+                        Location: {
                           Latitude: <value>
                           Longitude: <value>
+                        }
                         - If the location cannot be determined from the image, respond exactly with:
                           "Couldn't get the location."
                           and do not provide coordinates.

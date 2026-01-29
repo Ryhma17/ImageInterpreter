@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, Modal, TouchableOpacity, ScrollView, Dimensions, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, Image, Modal, TouchableOpacity, ScrollView, Dimensions, StatusBar, Button } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Timestamp } from '../firebase/Config';
 
@@ -10,18 +10,26 @@ interface DetailsModalProps {
     visible: boolean;
     onClose: () => void;
     onDelete?: () => void;
+    onOpenMap?: (location: { latitude: number; longitude: number }) => void;
     item: {
         image: any;
-        date?: Timestamp;
+        date: Timestamp;
         location?: { latitude: number; longitude: number } | null;
         title: string;
         subtitle: string;
     } | null;
 }
 
-const DetailsModal: React.FC<DetailsModalProps> = ({ visible, onClose, onDelete, item }) => {
+const DetailsModal: React.FC<DetailsModalProps> = ({ visible, onClose, onDelete, onOpenMap, item }) => {
     if (!item) return null;
     const formattedDate = item.date ? item.date.toDate().toLocaleString() : '';
+
+    const handleOpenMap = () => {
+        if (!item.location) return;
+        onClose();
+        onOpenMap?.(item.location);
+    };
+
     return (
         <Modal
             animationType="slide"
@@ -47,22 +55,22 @@ const DetailsModal: React.FC<DetailsModalProps> = ({ visible, onClose, onDelete,
                         <Image source={item.image} style={styles.image} resizeMode="cover" />
 
                         <View style={styles.detailsContent}>
-                            <View style={styles.dateContainer}>
-                                <Text style={styles.dateText}>{formattedDate}</Text>
+                            <View style={styles.rowContainer}>
+                                <View style={styles.columnContainer}>
+                                    <View style={styles.dateContainer}>
+                                        <Text style={styles.dateText}>{formattedDate}</Text>
+                                    </View>
+                                    <Text style={styles.promptTitle}>"{item.title}"</Text>
+                                </View>
+                                {item.location ?
+                                <TouchableOpacity style={styles.locationButton} onPress={handleOpenMap}>
+                                    <Ionicons name="compass" size={50} color="#FFCA28" />
+                                </TouchableOpacity> : null }  
                             </View>
-
-                            <Text style={styles.promptTitle}>"{item.title}"</Text>
-
                             <View style={styles.separatorLine} />
 
                             <Text style={styles.interpretationLabel}>AI INTERPRETATION:</Text>
 
-                            {item.location ? (
-                                <Text style={styles.interpretationText}>
-                                    <Text style={styles.locationLabel}>Location: </Text>
-                                    {item.location.latitude.toFixed(4)}, {item.location.longitude.toFixed(4)}
-                                </Text>
-                            ) : null}
                             <Text style={styles.interpretationText}>{item.subtitle}</Text>
 
                         </View>
@@ -157,10 +165,17 @@ const styles = StyleSheet.create({
         lineHeight: 24,
         marginBottom: 16,
     },
-    locationLabel: {
-        fontWeight: 'bold',
-        color: '#d8d8d8d8',
+    rowContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between"
     },
+    columnContainer: {
+        flexDirection: "column",
+        flex: 1
+    },
+    locationButton: {
+        alignSelf: "center"
+    }
 });
 
 export default DetailsModal;
