@@ -27,10 +27,24 @@ export const getLocalImages = async (): Promise<LocalImages[]> => { // Haetaan t
     }
 }
 
+
 export const deleteLocalImages = async () => { // kuvien poisto
     try {
         await AsyncStorage.removeItem('uploadedImages') // poistetaan kaikki kuvat local storagesta
     } catch (error) {
         console.error('Failed to delete local images:', error)
+    }
+}
+
+export const deleteLocalImage = async (cloudUrl: string) => { // yhden kuvan poisto
+    try {
+        const storedImages = await AsyncStorage.getItem('uploadedImages')
+        if (storedImages) {
+            const images: LocalImages[] = JSON.parse(storedImages)
+            const filteredImages = images.filter(img => img.cloudUrl !== cloudUrl)
+            await AsyncStorage.setItem('uploadedImages', JSON.stringify(filteredImages))
+        }
+    } catch (error) {
+        console.error('Failed to delete local image:', error)
     }
 }

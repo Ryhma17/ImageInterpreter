@@ -6,7 +6,9 @@ import DetailsModal from '../components/DetailsModal'
 // import { TESTI_HISTORIA } from '../testData/testiHistoriaa'
 import { Ionicons } from '@expo/vector-icons'
 import { auth, db, collection, Timestamp } from '../firebase/Config'
-import { onSnapshot, query, orderBy } from 'firebase/firestore'
+import { onSnapshot, query, orderBy, deleteDoc, doc } from 'firebase/firestore'
+import { deleteLocalImage } from '../services/localStorageService'
+import { Alert } from 'react-native'
 
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { CommonActions } from '@react-navigation/native'
@@ -139,6 +141,26 @@ const HistoryScreen = ({ navigation }: Props) => {
     setSelectedItem(null);
   };
 
+  const handleDelete = async () => {
+    if (!selectedItem || !auth.currentUser) return;
+
+    try {
+      const userId = auth.currentUser.uid;
+      await deleteDoc(doc(db, "data", userId, "history", selectedItem.id));
+
+      if (selectedItem.image && selectedItem.image.uri) {
+
+        await deleteLocalImage(selectedItem.image.uri);
+      }
+
+      setModalVisible(false);
+      setSelectedItem(null);
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      Alert.alert("Error", "Failed to delete item.");
+    }
+  };
+
   const searchWidth = searchAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [0, SCREEN_WIDTH - 80]
@@ -219,6 +241,7 @@ const HistoryScreen = ({ navigation }: Props) => {
           )
         }}
         item={selectedItem}
+        onDelete={handleDelete}
       />
     </SafeAreaView>
   )
