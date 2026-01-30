@@ -44,7 +44,17 @@ const RootNavigator = () => {
           <>
             <Stack.Screen name="Tabs" component={AppTabs} />
             <Stack.Screen name="Preview" component={PreviewScreen} />
-            <Stack.Screen name="Map" component={MapScreen} />
+            <Stack.Screen
+              name="Map"
+              component={MapScreen}
+              options={{
+                headerShown: true,
+                title: 'Map',
+                headerBackButtonDisplayMode: 'minimal',
+                headerTintColor: '#fff',
+                headerStyle: { backgroundColor: '#262626' },
+              }}
+            />
             <Stack.Screen name="Camera" component={CameraScreen} />
           </>
         ) : (

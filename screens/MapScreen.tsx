@@ -29,7 +29,7 @@ const MapScreen = ({ route }: Props) => {
   )
 
   return (
-    <SafeAreaView style={styles.container}>
+
       <MapView
         ref={mapRef}
         initialRegion={{
@@ -47,7 +47,7 @@ const MapScreen = ({ route }: Props) => {
         pinColor="Red"
       />
       </MapView>
-    </SafeAreaView>
+
   )
 }
 
