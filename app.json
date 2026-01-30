@@ -6,7 +6,8 @@
         {
           "photosPermission": "The app accesses your photos to send them to analyze"
         }
-      ]
+      ],
+      "expo-notifications"
     ],
     "name": "ImageInterpreter",
     "slug": "ImageInterpreter",
