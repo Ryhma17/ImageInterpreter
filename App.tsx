@@ -1,4 +1,5 @@
-import { StyleSheet, View, ActivityIndicator } from 'react-native';
+import { useEffect } from 'react';
+import { StyleSheet, View, ActivityIndicator, LogBox } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { NavigationContainer } from '@react-navigation/native';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -6,14 +7,27 @@ import AppTabs from './navigation/BottomNavigation';
 import LoginScreen from './screens/LoginScreen';
 import PreviewScreen from './screens/PreviewScreen';
 import MapScreen from './screens/MapScreen';
+import { scheduleDailyReminder } from './services/notificationHelper';
 
 import type { RootStackParamList } from './types/ParamListTypes';
 import CameraScreen from './screens/CameraScreen';
+
+if (__DEV__) {
+  LogBox.ignoreLogs([
+    'expo-notifications: Android Push notifications (remote notifications) functionality provided by expo-notifications was removed from Expo Go',
+    '`expo-notifications` functionality is not fully supported in Expo Go',
+  ]);
+}
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
 const RootNavigator = () => {
   const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (!user) return;
+    scheduleDailyReminder().catch((e) => console.warn('Failed to schedule reminder:', e));
+  }, [user]);
 
   if (loading) {
     return (

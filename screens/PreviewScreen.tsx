@@ -78,7 +78,9 @@ const PreviewScreen = ({ route, navigation }: Props) => {
     try {
       setIsAnalyzing(true)
       setAnswer(null)
+
       const text = await getAiAnswer(imageLocal, trimmed)
+
       const parsedTextandLocation = await parseLocation(text)
       setAnswer(parsedTextandLocation?.cleaned ?? text)
       setLocation(parsedTextandLocation?.location ?? null)
