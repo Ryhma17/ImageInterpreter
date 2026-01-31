@@ -7,7 +7,7 @@ import { UploadData, parseLocation } from '../services/dataUploadToFireStore'
 import { auth, Timestamp } from '../firebase/Config'
 import DetailsModal from '../components/DetailsModal'
 import { uploadFile } from '../firebase/storageService'
-import {  getLocalImages, saveImagesLocally } from '..//services/localStorageService'
+import {  getLocalImages, saveImagesLocally } from '../services/localStorageForImages'
 
 import { CommonActions } from '@react-navigation/native'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
@@ -38,7 +38,7 @@ const PreviewScreen = ({ route, navigation }: Props) => {
   }, [showModal, navigateAfterClose, navigation])
 
   useEffect(() => {
-    const uploadImageToCloud = async () => {
+    const uploadImageToCloudAndLocalStorage = async () => {
       if (!userId || imageUrl) return
 
       try {
@@ -59,7 +59,7 @@ const PreviewScreen = ({ route, navigation }: Props) => {
       }
     }
     
-    uploadImageToCloud()
+    uploadImageToCloudAndLocalStorage()
   }, [imageLocal, userId])
   
 
