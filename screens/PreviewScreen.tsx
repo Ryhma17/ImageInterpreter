@@ -7,8 +7,8 @@ import { UploadData, parseLocation } from '../services/dataUploadToFireStore'
 import { auth, Timestamp } from '../firebase/Config'
 import DetailsModal from '../components/DetailsModal'
 import { uploadFile } from '../firebase/storageService'
-import {  getLocalImages, saveImagesLocally } from '..//services/localStorageService'
-
+import {  getLocalImages, saveImagesLocally } from '../services/localStorageService'
+import { saveDataLocally, LocalData } from '../services/localStorageForData'
 import { CommonActions } from '@react-navigation/native'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import type { RootStackParamList } from '../types/ParamListTypes'
@@ -38,7 +38,7 @@ const PreviewScreen = ({ route, navigation }: Props) => {
   }, [showModal, navigateAfterClose, navigation])
 
   useEffect(() => {
-    const uploadImageToCloud = async () => {
+    const uploadImageToCloudAndLocalStorage = async () => {
       if (!userId || imageUrl) return
 
       try {
@@ -59,7 +59,7 @@ const PreviewScreen = ({ route, navigation }: Props) => {
       }
     }
     
-    uploadImageToCloud()
+    uploadImageToCloudAndLocalStorage()
   }, [imageLocal, userId])
   
 
@@ -82,10 +82,22 @@ const PreviewScreen = ({ route, navigation }: Props) => {
       const text = await getAiAnswer(imageLocal, trimmed)
 
       const parsedTextandLocation = await parseLocation(text)
+
       setAnswer(parsedTextandLocation?.cleaned ?? text)
       setLocation(parsedTextandLocation?.location ?? null)
       const uploaded = await UploadData(userId!,imageUrl!,text,trimmed)
       setUploadedAt(uploaded.timeNow)
+
+      const localData: LocalData = { // objektin luonti jotta voi tallentaa local storageen
+        userId: userId!,
+        imageUrl: imageUrl!,
+        aiAnswer: text,
+        userPrompt: trimmed,
+        timestamp: Date.now()
+      }
+      await saveDataLocally(localData)
+      
+
       if (uploaded) {
         setNavigateAfterClose(true)
         setShowModal(true)

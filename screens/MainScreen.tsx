@@ -70,7 +70,7 @@ const openCamera = async () => {
     <SafeAreaView style={styles.safeAreaContainer}>
       <Text style={styles.title}> New Scan</Text>
       <PressableButton icon="camera" text='Take Photo' onPress={openCamera}/>
-      <PressableButton icon="images" text='Chooose from Gallery' onPress={OpenGalleryModal}/>
+      <PressableButton icon="images" text='Choose from Gallery' onPress={OpenGalleryModal}/>
     </SafeAreaView>
   )
 }
