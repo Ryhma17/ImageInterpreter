@@ -1,11 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-interface LocalData {
+export interface LocalData {
     userId: string
     imageUrl: string
     aiAnswer: string
     userPrompt: string
     rating?: number
+    timestamp: number
 }
 
 const STORAGE_KEY = 'uploadedData'
@@ -31,9 +32,24 @@ export const getLocalData = async (): Promise<LocalData[]> => {
     }
 }
 
-export const deleteLocalData = async () => {
+export const deleteAllLocalData = async () => { // kaiken datan poisto
     try {
         await AsyncStorage.removeItem(STORAGE_KEY)
+    } catch (error) {
+        console.error('Failed to delete all local data', error)
+    }
+}
+
+export const deleteLocalData = async (timestamp: number) => { // yhden datan poisto
+    try {
+        const existingData = await AsyncStorage.getItem(STORAGE_KEY)
+        if (!existingData) return 
+
+        const allData: LocalData[] = JSON.parse(existingData)
+
+        const filteredData = allData.filter(item => item.timestamp !== timestamp)
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(filteredData))
+
     } catch (error) {
         console.error('Failed to delete local data', error)
     }
