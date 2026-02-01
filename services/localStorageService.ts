@@ -48,3 +48,18 @@ export const deleteLocalImage = async (cloudUrl: string) => { // yhden kuvan poi
         console.error('Failed to delete local image:', error)
     }
 }
+
+export const logAllAsyncStorageItems = async () => {
+    try {
+        const keys = await AsyncStorage.getAllKeys()
+        const items = await AsyncStorage.multiGet(keys)
+
+        console.log('--- STORAGE DUMP ---')
+        items.forEach(([key, value]) => {
+            console.log(`${key}:`, value)
+        })
+        console.log('--- END STORAGE DUMP ---')
+    } catch (error) {
+        console.error('Failed to log storage items:', error)
+    }
+}
