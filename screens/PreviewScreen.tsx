@@ -7,7 +7,7 @@ import { UploadData, parseLocation } from '../services/dataUploadToFireStore'
 import { auth, Timestamp } from '../firebase/Config'
 import DetailsModal from '../components/DetailsModal'
 import { uploadFile } from '../firebase/storageService'
-import {  getLocalImages, saveImagesLocally } from '../services/localStorageService'
+import { getLocalImages, saveImagesLocally } from '../services/localStorageService'
 import { saveDataLocally, LocalData } from '../services/localStorageForData'
 import { CommonActions } from '@react-navigation/native'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
@@ -43,25 +43,25 @@ const PreviewScreen = ({ route, navigation }: Props) => {
 
       try {
         setUploading(true)
-        
+
         // firebase cloud storageen tallennus
         const downloadURL = await uploadFile(imageLocal, userId)
         setImageUrl(downloadURL)
-        
+
         // local storageen tallennus
         await saveImagesLocally({ localUri: imageLocal, cloudUrl: downloadURL, timestamp: Date.now() })
-        
+
       } catch (error) {
         console.error('Failed to upload image:', error)
-        Alert.alert('Upload failed', 'Please try again later.') 
+        Alert.alert('Upload failed', 'Please try again later.')
       } finally {
         setUploading(false)
       }
     }
-    
+
     uploadImageToCloudAndLocalStorage()
   }, [imageLocal, userId])
-  
+
 
   const onCancel = () => {
     navigation.navigate("Tabs", { screen: "Main" })
@@ -85,7 +85,7 @@ const PreviewScreen = ({ route, navigation }: Props) => {
 
       setAnswer(parsedTextandLocation?.cleaned ?? text)
       setLocation(parsedTextandLocation?.location ?? null)
-      const uploaded = await UploadData(userId!,imageUrl!,text,trimmed)
+      const uploaded = await UploadData(userId!, imageUrl!, text, trimmed)
       setUploadedAt(uploaded.timeNow)
 
       const localData: LocalData = { // objektin luonti jotta voi tallentaa local storageen
@@ -96,7 +96,7 @@ const PreviewScreen = ({ route, navigation }: Props) => {
         timestamp: Date.now()
       }
       await saveDataLocally(localData)
-      
+
 
       if (uploaded) {
         setNavigateAfterClose(true)
@@ -111,9 +111,9 @@ const PreviewScreen = ({ route, navigation }: Props) => {
 
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
-      <DetailsModal 
+      <DetailsModal
         visible={showModal}
-        item={{image: { uri: imageLocal}, title: prompt!, subtitle: answer!, date: uploadedAt!, location: location}}
+        item={{ image: { uri: imageLocal }, title: prompt!, subtitle: answer!, date: uploadedAt!, location: location }}
         onOpenMap={(loc) => {
           setNavigateAfterClose(false)
           setShowModal(false)
@@ -127,27 +127,27 @@ const PreviewScreen = ({ route, navigation }: Props) => {
             })
           )
         }}
-        onClose={() => setShowModal(false)}/>
-      {isAnalyzing ? 
+        onClose={() => setShowModal(false)} />
+      {isAnalyzing ?
         <View style={styles.loading}>
           <ActivityIndicator size='large' color="#FF6F00" />
         </View> : null}
 
-          <Image source={{ uri: imageLocal }} style={styles.image} />
-          <Text style={styles.title}>Ask a question about this image:</Text>
-          <View style={styles.textInputContainer}>
-            <TextInput
-             style={styles.text}
-             placeholder='e.g What is in the picture?'
-             placeholderTextColor="#6d6c6c"
-             onChangeText={setPrompt}
-             value={prompt ?? ""}
-             editable={!isAnalyzing} />
-          </View>
-          <View style={styles.buttonContainer}>
-            <BasicButton text="Cancel" onPress={onCancel} BgColor='#2c2c2c' />
-            <BasicButton text="Analyze" onPress={onAnalyze} BgColor='#ffae03' />
-          </View>
+      <Image source={{ uri: imageLocal }} style={styles.image} />
+      <Text style={styles.title}>Ask a question about this image:</Text>
+      <View style={styles.textInputContainer}>
+        <TextInput
+          style={styles.text}
+          placeholder='e.g What is in the picture?'
+          placeholderTextColor="#6d6c6c"
+          onChangeText={setPrompt}
+          value={prompt ?? ""}
+          editable={!isAnalyzing} />
+      </View>
+      <View style={styles.buttonContainer}>
+        <BasicButton text="Cancel" onPress={onCancel} BgColor='#2c2c2c' />
+        <BasicButton text="Analyze" onPress={onAnalyze} BgColor='#ffae03' />
+      </View>
     </SafeAreaView>
   )
 }

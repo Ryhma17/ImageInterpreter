@@ -56,7 +56,23 @@ export const logAllAsyncStorageItems = async () => {
 
         console.log('--- STORAGE DUMP ---')
         items.forEach(([key, value]) => {
-            console.log(`${key}:`, value)
+            if (value) {
+                try {
+                    const parsed = JSON.parse(value)
+                    if (Array.isArray(parsed)) {
+                        console.log(`${key}:`)
+                        parsed.forEach((item, index) => {
+                            console.log(`  [${index}]`, JSON.stringify(item, null, 2))
+                        })
+                    } else {
+                        console.log(`${key}:`, JSON.stringify(parsed, null, 2))
+                    }
+                } catch (e) {
+                    console.log(`${key}:`, value)
+                }
+            } else {
+                console.log(`${key}: null`)
+            }
         })
         console.log('--- END STORAGE DUMP ---')
     } catch (error) {
