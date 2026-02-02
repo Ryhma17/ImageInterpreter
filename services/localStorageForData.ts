@@ -43,7 +43,7 @@ export const deleteAllLocalData = async () => { // kaiken datan poisto
 export const deleteLocalData = async (timestamp: number) => { // yhden datan poisto
     try {
         const existingData = await AsyncStorage.getItem(STORAGE_KEY)
-        if (!existingData) return 
+        if (!existingData) return
 
         const allData: LocalData[] = JSON.parse(existingData)
 
@@ -52,5 +52,19 @@ export const deleteLocalData = async (timestamp: number) => { // yhden datan poi
 
     } catch (error) {
         console.error('Failed to delete local data', error)
+    }
+}
+
+export const getLastLocalSession = async (): Promise<LocalData | null> => {
+    try {
+        const storedData = await AsyncStorage.getItem(STORAGE_KEY)
+        if (storedData) {
+            const data: LocalData[] = JSON.parse(storedData)
+            return data.length > 0 ? data[data.length - 1] : null
+        }
+        return null
+    } catch (error) {
+        console.error('Failed to get last local session:', error)
+        return null
     }
 }

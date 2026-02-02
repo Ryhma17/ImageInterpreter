@@ -4,6 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase/Config';
+import { logAllAsyncStorageItems } from '../services/localStorageService';
+import { getLastLocalSession, LocalData } from '../services/localStorageForData';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -15,8 +17,15 @@ const LoginScreen = () => {
     const [isSignUp, setIsSignUp] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [lastSession, setLastSession] = useState<LocalData | null>(null);
+
+    React.useEffect(() => {
+        logAllAsyncStorageItems();
+        getLastLocalSession().then(setLastSession);
+    }, []);
 
     const handleAuth = async () => {
+
         if (!email || !password) {
             Alert.alert('Error', 'Please enter email and password');
             return;
@@ -176,6 +185,16 @@ const LoginScreen = () => {
                                 {isSignUp ? "Already have an account?" : "Don't have an account?"} <Text style={styles.signUpText}>{isSignUp ? "Sign In" : "Sign Up"}</Text>
                             </Text>
                         </TouchableOpacity>
+
+                        {lastSession && (
+                            <View style={styles.lastSessionContainer}>
+                                <Text style={styles.lastSessionTitle}>Last Session:</Text>
+                                <Text style={styles.lastSessionPrompt}>"{lastSession.userPrompt}"</Text>
+                                <Text style={styles.lastSessionAnswer} numberOfLines={2} ellipsizeMode='tail'>
+                                    {lastSession.aiAnswer}
+                                </Text>
+                            </View>
+                        )}
                     </View>
                 </KeyboardAvoidingView>
             </SafeAreaView>
@@ -276,6 +295,26 @@ const styles = StyleSheet.create({
     signUpText: {
         color: '#FFFFFF',
         fontWeight: '600',
+    },
+    lastSessionContainer: {
+        marginTop: 40,
+        backgroundColor: '#333',
+        padding: 16,
+        borderRadius: 12,
+        width: '100%',
+    },
+    lastSessionTitle: {
+        color: '#FFCA28',
+        fontWeight: 'bold',
+        marginBottom: 4,
+    },
+    lastSessionPrompt: {
+        color: '#AAAAAA',
+        fontStyle: 'italic',
+        marginBottom: 8,
+    },
+    lastSessionAnswer: {
+        color: '#FFFFFF',
     }
 });
 
