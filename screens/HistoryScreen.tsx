@@ -6,9 +6,10 @@ import DetailsModal from '../components/DetailsModal'
 // import { TESTI_HISTORIA } from '../testData/testiHistoriaa'
 import { Ionicons } from '@expo/vector-icons'
 import { auth, db, collection, Timestamp } from '../firebase/Config'
-import { onSnapshot, query, orderBy, deleteDoc, doc } from 'firebase/firestore'
+import { onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from 'firebase/firestore'
 import { deleteLocalImage } from '../services/localStorageService'
 import { Alert } from 'react-native'
+import { updateLocalDataRating } from '../services/localStorageForData'
 
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { CommonActions } from '@react-navigation/native'
@@ -33,6 +34,7 @@ interface HistoryDataItem {
   } | null;
   title: string;
   subtitle: string;
+  rating?: number;
 }
 
 const HistoryScreen = ({ navigation }: Props) => {
@@ -76,6 +78,7 @@ const HistoryScreen = ({ navigation }: Props) => {
           location: loc,
           title: data.prompt || "No Title",
           subtitle: data.answer || "No description available",
+          rating: data.rating || 0
         });
       });
       setHistoryData(items);
@@ -161,6 +164,37 @@ const HistoryScreen = ({ navigation }: Props) => {
     }
   };
 
+  const handleRate = async (rating: number) => {
+    if (!selectedItem || !auth.currentUser) return;
+
+    try {
+      const userId = auth.currentUser.uid;
+      // Update Firestore
+      await updateDoc(doc(db, "data", userId, "history", selectedItem.id), {
+        rating: rating
+      });
+
+      // Update local state for immediate feedback provided by onSnapshot, but we can also update selectedItem locally
+      setSelectedItem((prev: any) => ({ ...prev, rating }));
+
+      // Update local storage if applicable (not strictly linked here but good practice if synced)
+      // Since HistoryScreen fetches from Firestore, local storage update is for "Preview" flow mostly, 
+      // but if we want to sync them:
+      // Local storage uses timestamp as ID sort of.
+      // We have selectedItem.date which is a Timestamp. 
+      // Convert to millis for localStorage match if needed.
+      if (selectedItem.date && typeof selectedItem.date.toMillis === 'function') {
+        await updateLocalDataRating(selectedItem.date.toMillis(), rating);
+      } else if (selectedItem.date && typeof selectedItem.date === 'number') {
+        await updateLocalDataRating(selectedItem.date, rating);
+      }
+
+    } catch (error) {
+      console.error("Error updating rating:", error);
+      Alert.alert("Error", "Failed to update rating.");
+    }
+  }
+
   const searchWidth = searchAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [0, SCREEN_WIDTH - 80]
@@ -242,6 +276,7 @@ const HistoryScreen = ({ navigation }: Props) => {
         }}
         item={selectedItem}
         onDelete={handleDelete}
+        onRate={handleRate}
       />
     </SafeAreaView>
   )

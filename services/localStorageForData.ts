@@ -68,3 +68,21 @@ export const getLastLocalSession = async (): Promise<LocalData | null> => {
         return null
     }
 }
+
+export const updateLocalDataRating = async (timestamp: number, rating: number) => {
+    try {
+        const existingData = await AsyncStorage.getItem(STORAGE_KEY)
+        if (!existingData) return
+
+        const allData: LocalData[] = JSON.parse(existingData)
+
+        // Find the item with matching timestamp and update its rating
+        const updatedData = allData.map(item =>
+            item.timestamp === timestamp ? { ...item, rating } : item
+        )
+
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData))
+    } catch (error) {
+        console.error('Failed to update local data rating', error)
+    }
+}
