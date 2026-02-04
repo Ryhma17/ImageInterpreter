@@ -4,8 +4,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { auth } from '../firebase/Config';
 import { signOut } from 'firebase/auth';
 import { LinearGradient } from 'expo-linear-gradient';
+import { RootStackParamList } from '../types/ParamListTypes';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-type Props = {}
+type Props = NativeStackScreenProps<RootStackParamList, "Profile">
 
 const ProfileScreen = (props: Props) => {
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -22,6 +24,24 @@ const ProfileScreen = (props: Props) => {
 
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
+      <View style={styles.graphButtonContainer}>
+          <TouchableOpacity 
+            onPress={() => {props.navigation.navigate('Graph')}}
+            style={styles.buttonContainer}
+          >
+            <LinearGradient
+              colors={['#FFCA28', '#FF6F00']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.button}
+            >
+
+              <Text style={styles.graphButtonText}>Your stats</Text>
+
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+
       <View style={styles.contentContainer}>
         <Text style={styles.title}>Profile</Text>
         <Text style={styles.subtitle}>{auth.currentUser?.email}</Text>
@@ -92,5 +112,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     letterSpacing: 1,
+  },
+  graphButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+    letterSpacing: 1
+  },
+  graphButton: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    borderRadius: 25,
+  },
+  graphButtonContainer: {
+    paddingHorizontal: 24,
+    marginTop: 22
   }
 });

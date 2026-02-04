@@ -11,6 +11,7 @@ import { scheduleDailyReminder } from './services/notificationHelper';
 
 import type { RootStackParamList } from './types/ParamListTypes';
 import CameraScreen from './screens/CameraScreen';
+import GraphsScreen from './screens/GraphsScreen';
 
 if (__DEV__) {
   LogBox.ignoreLogs([
@@ -56,6 +57,7 @@ const RootNavigator = () => {
               }}
             />
             <Stack.Screen name="Camera" component={CameraScreen} />
+            <Stack.Screen name="Graph" component={GraphsScreen} />
           </>
         ) : (
           <Stack.Screen name="Login" component={LoginScreen} />

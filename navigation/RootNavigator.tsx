@@ -6,6 +6,7 @@ import MapScreen from '../screens/MapScreen'
 
 import type { RootStackParamList } from '../types/ParamListTypes'
 import CameraScreen from '../screens/CameraScreen'
+import GraphsScreen from '../screens/GraphsScreen'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
@@ -16,6 +17,7 @@ const RootNavigator = () => {
         <Stack.Screen name="Preview" component={PreviewScreen} />
         <Stack.Screen name="Map" component={MapScreen} />
         <Stack.Screen name="Camera" component={CameraScreen} />
+        <Stack.Screen name="Graph" component={GraphsScreen} />
       </Stack.Navigator>
   )
 }
