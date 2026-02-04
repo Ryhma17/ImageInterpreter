@@ -9,13 +9,15 @@ const UploadData = async (
 ) => {
     try {
         const historyRef = collection(db, "data", userId, "history")
-        const usageColRef = collection(db, "data", userId, "usage")
-        const usageDocRef = doc(usageColRef, "allTime")
+        const usageColRef = collection(db, "data", userId, "usageAmount")
+        const usageAllTimeDocRef = doc(usageColRef, "allTime")
+        const usageTimesColRef = collection(db, "data", userId, "timestampsForUsage")
         
+
         const location = await parseLocation(aiAnswer)
         const timeNow = Timestamp.now()
 
-        const docRef = await addDoc(historyRef, {
+            await addDoc(historyRef, {
             "image": imageUrl,
             "prompt": userPrompt,
             "answer": location?.cleaned ?? aiAnswer,
@@ -24,8 +26,12 @@ const UploadData = async (
             "timestamp": timeNow
         })
 
+        await addDoc(usageTimesColRef, {
+            "timestamp": timeNow
+        })
+
         await runTransaction(db, async (tx) => {
-           tx.set(usageDocRef,
+           tx.set(usageAllTimeDocRef,
             {
                 total: increment(1),
                 updatedAt: timeNow
