@@ -13,5 +13,7 @@ export type RootStackParamList = {
     Preview: {imageLocal: string, imageUrl?: string }
   Map: { location: location }
     Login: undefined
+    Graph: undefined
     Camera: undefined
+    Profile: undefined
 }
