@@ -4,6 +4,7 @@ import React from 'react'
 import { RootStackParamList } from "../types/ParamListTypes";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Ionicons } from "@expo/vector-icons";
+import WeeklyGraph from "../components/WeeklyGraph";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Graph">
 
@@ -19,6 +20,8 @@ const GraphsScreen = ({ navigation }: Props) => {
                 </TouchableOpacity>
                 <Text style={styles.title}>Statistics</Text>
             </View>
+
+            <WeeklyGraph />
         </SafeAreaView>
     )
 }
