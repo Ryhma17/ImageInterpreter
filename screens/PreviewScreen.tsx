@@ -4,12 +4,13 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import BasicButton from '../components/BasicButton'
 import { getAiAnswer } from '../firebase/AiConfig'
 import { UploadData, parseLocation } from '../services/dataUploadToFireStore'
-import { auth, Timestamp } from '../firebase/Config'
+import { auth, Timestamp, db, doc } from '../firebase/Config'
 import DetailsModal from '../components/DetailsModal'
 import { uploadFile } from '../firebase/storageService'
 import { getLocalImages, saveImagesLocally } from '../services/localStorageService'
-import { saveDataLocally, LocalData } from '../services/localStorageForData'
+import { saveDataLocally, LocalData, updateLocalDataRating } from '../services/localStorageForData'
 import { CommonActions } from '@react-navigation/native'
+import { updateDoc } from 'firebase/firestore'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import type { RootStackParamList } from '../types/ParamListTypes'
 import type { location } from '../types/LocationTypes'
@@ -25,6 +26,9 @@ const PreviewScreen = ({ route, navigation }: Props) => {
   const [prompt, setPrompt] = useState<string | null>(null)
   const [answer, setAnswer] = useState<string | null>(null)
   const [uploadedAt, setUploadedAt] = useState<Timestamp | null>(null)
+  const [uploadedDocId, setUploadedDocId] = useState<string | null>(null)
+  const [localTimestamp, setLocalTimestamp] = useState<number | null>(null)
+  const [rating, setRating] = useState<number>(0)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [navigateAfterClose, setNavigateAfterClose] = useState(false)
@@ -78,6 +82,7 @@ const PreviewScreen = ({ route, navigation }: Props) => {
     try {
       setIsAnalyzing(true)
       setAnswer(null)
+      setRating(0) // Reset rating for new analysis
 
       const text = await getAiAnswer(imageLocal, trimmed)
 
@@ -87,13 +92,19 @@ const PreviewScreen = ({ route, navigation }: Props) => {
       setLocation(parsedTextandLocation?.location ?? null)
       const uploaded = await UploadData(userId!, imageUrl!, text, trimmed)
       setUploadedAt(uploaded.timeNow)
+      if (uploaded.id) {
+        setUploadedDocId(uploaded.id)
+      }
+
+      const timestamp = Date.now()
+      setLocalTimestamp(timestamp)
 
       const localData: LocalData = { // objektin luonti jotta voi tallentaa local storageen
         userId: userId!,
         imageUrl: imageUrl!,
         aiAnswer: text,
         userPrompt: trimmed,
-        timestamp: Date.now()
+        timestamp: timestamp
       }
       await saveDataLocally(localData)
 
@@ -109,11 +120,39 @@ const PreviewScreen = ({ route, navigation }: Props) => {
     }
   }
 
+  const handleRate = async (newRating: number) => {
+    setRating(newRating);
+
+    // Update Firestore if we have a doc ID
+    if (userId && uploadedDocId) {
+      try {
+        await updateDoc(doc(db, "data", userId, "history", uploadedDocId), {
+          rating: newRating
+        });
+      } catch (error) {
+        console.error("Failed to update Firestore rating in Preview:", error);
+      }
+    }
+
+    // Update Local Storage
+    if (localTimestamp) {
+      await updateLocalDataRating(localTimestamp, newRating)
+    }
+  }
+
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
       <DetailsModal
         visible={showModal}
-        item={{ image: { uri: imageLocal }, title: prompt!, subtitle: answer!, date: uploadedAt!, location: location }}
+        item={{
+          image: { uri: imageLocal },
+          title: prompt!,
+          subtitle: answer!,
+          date: uploadedAt!,
+          location: location,
+          rating: rating
+        }}
+        onRate={handleRate}
         onOpenMap={(loc) => {
           setNavigateAfterClose(false)
           setShowModal(false)
