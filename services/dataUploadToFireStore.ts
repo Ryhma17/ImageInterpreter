@@ -1,4 +1,4 @@
-import { db, addDoc, collection, Timestamp, runTransaction, increment, doc  } from "../firebase/Config"
+import { db, addDoc, collection, Timestamp, runTransaction, increment, doc, getDocs  } from "../firebase/Config"
 
 const UploadData = async (
     userId: string,
@@ -58,4 +58,20 @@ const parseLocation = async (aiAnswer: string) => {
     return {location, cleaned}
 }
 
-export { UploadData, parseLocation }
+const getGraphData = async (userId: string) => {
+    const querySnapshot = await getDocs(collection(db, "data", userId, "timestampsForUsage"))
+
+    return querySnapshot.docs.map(doc => {
+        const data = doc.data() as { timestamp?: Timestamp }
+
+        const stamp = data.timestamp
+        const date = stamp ? stamp.toDate() : null
+
+        return {
+            id: doc.id,
+            local: date?.toLocaleString()
+        }
+    }) 
+}
+
+export { UploadData, parseLocation, getGraphData }

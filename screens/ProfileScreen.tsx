@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { auth } from '../firebase/Config';
@@ -6,6 +6,7 @@ import { signOut } from 'firebase/auth';
 import { LinearGradient } from 'expo-linear-gradient';
 import { RootStackParamList } from '../types/ParamListTypes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { getGraphData } from '../services/dataUploadToFireStore';
 
 type Props = NativeStackScreenProps<RootStackParamList, "Profile">
 
@@ -22,6 +23,16 @@ const ProfileScreen = (props: Props) => {
     }
   };
 
+  useEffect(() => {
+    const dataFetch = async() =>{
+      const data = await getGraphData(auth.currentUser?.uid!)
+      console.log(data)
+    }
+    
+
+    dataFetch()
+  },[])
+ 
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
       <View style={styles.graphButtonContainer}>
