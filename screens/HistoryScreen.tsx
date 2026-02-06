@@ -16,6 +16,7 @@ import { CommonActions } from '@react-navigation/native'
 import type { CompositeScreenProps } from '@react-navigation/native'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import type { RootStackParamList, TabParamList } from '../types/ParamListTypes'
+import { insertTestTimestamps } from '../services/dataUploadToFireStore'
 
 type Props = CompositeScreenProps<
   BottomTabScreenProps<TabParamList, 'History'>,
@@ -56,6 +57,8 @@ const HistoryScreen = ({ navigation }: Props) => {
       setLoading(false);
       return;
     }
+
+    insertTestTimestamps(userId)
 
     const q = query(collection(db, "data", userId, "history"), orderBy("timestamp", "desc"));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
