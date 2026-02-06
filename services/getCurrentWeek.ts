@@ -1,24 +1,35 @@
-import { addDays, format, isSameDay, startOfDay, startOfWeek } from "date-fns";
+import { startOfWeek, addDays, isSameDay, format } from "date-fns";
 import type { BarData, UsageEvent } from "../types/GraphTypes";
 
-export const getCurrentWeekUsage = (events: UsageEvent[]): BarData[] => {
-  const today = new Date();
+const startOfDay = (date: Date) => {
+    const day = new Date(date)
+    day.setHours(0,0,0,0)
+    return day
+}
 
-  const weekStart = startOfDay(startOfWeek(today, { weekStartsOn: 1 }));
+const getCurrentWeekUsage = (
+    events: UsageEvent[]
+): BarData[] => {
+    
+    const today = new Date()
 
-  const daysOfWeek = Array.from({ length: 7 }).map((_, i) =>
-    startOfDay(addDays(weekStart, i))
-  );
+    const weekStart = startOfDay(startOfWeek(today, {weekStartsOn: 1}))
 
-  return daysOfWeek.map((day) => {
-    const count = events.filter((event) => {
-      const eventDate = startOfDay(new Date(event.createdAt));
-      return isSameDay(eventDate, day);
-    }).length;
+    const daysOfTheWeek: Date[] = Array.from({length: 7}).map((_, i) => 
+        startOfDay(addDays(weekStart, i))
+    )
 
-    return {
-      label: format(day, "EEE"),
-      value: count,
-    };
-  });
-};
+    return daysOfTheWeek.map(day => {
+        const count = events.filter(event => {
+            const eventDate = startOfDay(new Date(event.createdAt))
+            return isSameDay(eventDate, day)
+        }).length
+
+        return {
+            label: format(day, "EEE"),
+            value: count
+        }
+    })
+}
+
+export {getCurrentWeekUsage}

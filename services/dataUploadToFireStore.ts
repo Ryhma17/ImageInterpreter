@@ -1,6 +1,5 @@
-import { db, addDoc, collection, Timestamp, runTransaction, increment, doc } from "../firebase/Config"
-import { getDocs } from "firebase/firestore"
-import type { UsageEvent } from "../types/GraphTypes"
+import { db, addDoc, collection, Timestamp, runTransaction, increment, doc, getDocs  } from "../firebase/Config"
+import { UsageEvent } from "../types/GraphTypes"
 
 const UploadData = async (
     userId: string,
@@ -53,8 +52,7 @@ const UploadData = async (
 const parseLocation = async (aiAnswer: string) => {
     const match = aiAnswer.match(/Location:\s*{\s*Latitude:\s*([-\d.]+)\s*,?\s*Longitude:\s*([-\d.]+)\s*}/i)
     if (!match) return
-    const location = { latitude: Number(match[1]), longitude: Number(match[2]) }
-    console.log(location)
+    const location = {latitude: Number(match[1]), longitude: Number(match[2])}
 
     const cleaned = aiAnswer.replace(/Location:\s*{\s*[\s\S]*?\s*}/i, '').trim();
     return { location, cleaned }
@@ -63,8 +61,9 @@ const parseLocation = async (aiAnswer: string) => {
 const getGraphData = async (userId: string): Promise<UsageEvent[]> => {
     const querySnapshot = await getDocs(collection(db, "data", userId, "timestampsForUsage"))
 
-    return querySnapshot.docs.flatMap((d) => {
-        const data = d.data() as { timestamp?: Timestamp }
+    return querySnapshot.docs.flatMap((doc) => {
+        const data = doc.data() as { timestamp?: Timestamp }
+
         const stamp = data.timestamp
         if (!stamp) return []
 

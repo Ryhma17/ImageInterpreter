@@ -19,6 +19,7 @@ const GraphsScreen = ({ navigation }: Props) => {
                     <Ionicons name="arrow-back-outline" size={26} color="#FFFFFF"  />
                 </TouchableOpacity>
                 <Text style={styles.title}>Statistics</Text>
+                <WeeklyGraph/>
             </View>
 
             <WeeklyGraph />
