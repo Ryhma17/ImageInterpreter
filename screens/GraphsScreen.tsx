@@ -5,10 +5,12 @@ import { RootStackParamList } from "../types/ParamListTypes";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Ionicons } from "@expo/vector-icons";
 import WeeklyGraph from "../components/WeeklyGraph";
+import DailyGraph from "../components/DailyGraph";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Graph">
 
 const GraphsScreen = ({ navigation }: Props) => {
+    
     return (
         <SafeAreaView style={styles.safeAreaContainer}>
             <View style={styles.header}>
@@ -22,6 +24,7 @@ const GraphsScreen = ({ navigation }: Props) => {
             </View>
 
             <WeeklyGraph />
+            <DailyGraph />
         </SafeAreaView>
     )
 }

@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { BarChart } from "react-native-gifted-charts";
-import { getCurrentWeekUsage } from "../services/getCurrentWeek";
+import { getCurrentWeekUsage } from "../services/getCurrentWeekData";
 import type { UsageEvent } from "../types/GraphTypes";
 import { isSameDay } from "date-fns";
 
@@ -36,6 +36,16 @@ const WeeklyUsageChart = ({ events }: { events: UsageEvent[] }) => {
       isAnimated
       yAxisThickness={0}
       xAxisThickness={1}
+      topLabelTextStyle={{
+        color: "#FFF"
+      }}
+      yAxisTextStyle={{
+        color: "#FFF"
+      }}
+      xAxisLabelTextStyle={{
+        color: "#FFF"
+      }}
+
     />
   );
 };

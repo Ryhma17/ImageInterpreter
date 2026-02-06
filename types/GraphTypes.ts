@@ -9,3 +9,9 @@ export interface BarData {
   value: number;
   date: Date
 }
+
+export type PieData = {
+  value: number;
+  color: string;
+  text: string;
+}

@@ -23,15 +23,6 @@ const ProfileScreen = (props: Props) => {
     }
   };
 
-  useEffect(() => {
-    const dataFetch = async() =>{
-      const data = await getGraphData(auth.currentUser?.uid!)
-      console.log(data)
-    }
-    
-
-    dataFetch()
-  },[])
  
   return (
     <SafeAreaView style={styles.safeAreaContainer}>

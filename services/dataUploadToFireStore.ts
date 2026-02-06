@@ -75,4 +75,31 @@ const getGraphData = async (userId: string): Promise<UsageEvent[]> => {
     })
 }
 
-export { UploadData, parseLocation, getGraphData }
+
+
+const insertTestTimestamps = async (userId: string) => {
+  const col = collection(db, "data", userId, "timestampsForUsage");
+
+  const dates = [
+    "2026-02-06T00:15:12+02:00",
+    "2026-02-06T02:43:55+02:00",
+    "2026-02-06T05:59:01+02:00",
+    "2026-02-06T06:01:33+02:00",
+    "2026-02-06T08:22:17+02:00",
+    "2026-02-06T11:58:49+02:00",
+    "2026-02-06T12:10:05+02:00",
+    "2026-02-06T14:37:22+02:00",
+    "2026-02-06T17:59:59+02:00",
+    "2026-02-06T18:00:01+02:00",
+    "2026-02-06T20:44:13+02:00",
+    "2026-02-06T23:51:42+02:00",
+  ];
+
+  for (const d of dates) {
+    await addDoc(col, {
+      timestamp: Timestamp.fromDate(new Date(d))
+    });
+  }
+};
+
+export { UploadData, parseLocation, getGraphData, insertTestTimestamps }
