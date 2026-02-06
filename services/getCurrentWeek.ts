@@ -27,7 +27,8 @@ const getCurrentWeekUsage = (
 
         return {
             label: format(day, "EEE"),
-            value: count
+            value: count,
+            date: day
         }
     })
 }

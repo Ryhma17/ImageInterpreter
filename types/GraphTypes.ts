@@ -7,4 +7,5 @@ export interface UsageEvent {
 export interface BarData {
   label: string;
   value: number;
+  date: Date
 }
