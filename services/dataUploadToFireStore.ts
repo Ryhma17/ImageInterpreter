@@ -1,5 +1,8 @@
 import { db, addDoc, collection, Timestamp, runTransaction, increment, doc, getDocs  } from "../firebase/Config"
+<<<<<<< HEAD
 import { UsageEvent } from "../types/GraphTypes"
+=======
+>>>>>>> 440c65bf1dee4ca37e1e42f0b7f3c3221afc3415
 
 const UploadData = async (
     userId: string,
@@ -18,7 +21,11 @@ const UploadData = async (
         const location = await parseLocation(aiAnswer)
         const timeNow = Timestamp.now()
 
+<<<<<<< HEAD
         const historyDocRef = await addDoc(historyRef, {
+=======
+            await addDoc(historyRef, {
+>>>>>>> 440c65bf1dee4ca37e1e42f0b7f3c3221afc3415
             "image": imageUrl,
             "prompt": userPrompt,
             "answer": location?.cleaned ?? aiAnswer,
