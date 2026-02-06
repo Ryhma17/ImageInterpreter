@@ -1,8 +1,6 @@
-import { db, addDoc, collection, Timestamp, runTransaction, increment, doc, getDocs  } from "../firebase/Config"
-<<<<<<< HEAD
-import { UsageEvent } from "../types/GraphTypes"
-=======
->>>>>>> 440c65bf1dee4ca37e1e42f0b7f3c3221afc3415
+import { db, addDoc, collection, Timestamp, runTransaction, increment, doc } from "../firebase/Config"
+import { getDocs } from "firebase/firestore"
+import type { UsageEvent } from "../types/GraphTypes"
 
 const UploadData = async (
     userId: string,
@@ -21,11 +19,7 @@ const UploadData = async (
         const location = await parseLocation(aiAnswer)
         const timeNow = Timestamp.now()
 
-<<<<<<< HEAD
         const historyDocRef = await addDoc(historyRef, {
-=======
-            await addDoc(historyRef, {
->>>>>>> 440c65bf1dee4ca37e1e42f0b7f3c3221afc3415
             "image": imageUrl,
             "prompt": userPrompt,
             "answer": location?.cleaned ?? aiAnswer,
@@ -68,8 +62,8 @@ const parseLocation = async (aiAnswer: string) => {
 const getGraphData = async (userId: string): Promise<UsageEvent[]> => {
     const querySnapshot = await getDocs(collection(db, "data", userId, "timestampsForUsage"))
 
-    return querySnapshot.docs.flatMap((doc) => {
-        const data = doc.data() as { timestamp?: Timestamp }
+    return querySnapshot.docs.flatMap((d) => {
+        const data = d.data() as { timestamp?: Timestamp }
 
         const stamp = data.timestamp
         if (!stamp) return []
