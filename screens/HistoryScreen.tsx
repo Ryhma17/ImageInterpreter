@@ -172,20 +172,12 @@ const HistoryScreen = ({ navigation }: Props) => {
 
     try {
       const userId = auth.currentUser.uid;
-      // Update Firestore
       await updateDoc(doc(db, "data", userId, "history", selectedItem.id), {
         rating: rating
       });
 
-      // Update local state for immediate feedback provided by onSnapshot, but we can also update selectedItem locally
       setSelectedItem((prev: any) => ({ ...prev, rating }));
 
-      // Update local storage if applicable (not strictly linked here but good practice if synced)
-      // Since HistoryScreen fetches from Firestore, local storage update is for "Preview" flow mostly, 
-      // but if we want to sync them:
-      // Local storage uses timestamp as ID sort of.
-      // We have selectedItem.date which is a Timestamp. 
-      // Convert to millis for localStorage match if needed.
       if (selectedItem.date && typeof selectedItem.date.toMillis === 'function') {
         await updateLocalDataRating(selectedItem.date.toMillis(), rating);
       } else if (selectedItem.date && typeof selectedItem.date === 'number') {
