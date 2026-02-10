@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React from 'react'
 import { RootStackParamList } from "../types/ParamListTypes";
@@ -6,6 +6,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Ionicons } from "@expo/vector-icons";
 import WeeklyGraph from "../components/WeeklyGraph";
 import DailyGraph from "../components/DailyGraph";
+import AllTimeGraph from "../components/AllTimeGraph";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Graph">
 
@@ -23,8 +24,11 @@ const GraphsScreen = ({ navigation }: Props) => {
                 <Text style={styles.title}>Statistics</Text>
             </View>
 
+            <ScrollView>
             <WeeklyGraph />
             <DailyGraph />
+            <AllTimeGraph />
+            </ScrollView>
         </SafeAreaView>
     )
 }
