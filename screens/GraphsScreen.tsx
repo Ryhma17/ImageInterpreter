@@ -26,7 +26,6 @@ const GraphsScreen = ({ navigation }: Props) => {
             </View>
 
             <ScrollView contentContainerStyle={styles.scrollContent}>
-                
                 <WeeklyGraph />
                 <DailyGraph />
                 <AiReviewsGraph />
