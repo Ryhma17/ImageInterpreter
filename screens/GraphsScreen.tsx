@@ -6,28 +6,31 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Ionicons } from "@expo/vector-icons";
 import WeeklyGraph from "../components/WeeklyGraph";
 import DailyGraph from "../components/DailyGraph";
+import AiReviewsGraph from "../components/AiReviewsGraph";
 import AllTimeGraph from "../components/AllTimeGraph";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Graph">
 
 const GraphsScreen = ({ navigation }: Props) => {
-    
+
     return (
         <SafeAreaView style={styles.safeAreaContainer}>
             <View style={styles.header}>
                 <TouchableOpacity
-                onPress={() => navigation.goBack()}
-                style={styles.headerButton}
+                    onPress={() => navigation.goBack()}
+                    style={styles.headerButton}
                 >
-                    <Ionicons name="arrow-back-outline" size={26} color="#FFFFFF"  />
+                    <Ionicons name="arrow-back-outline" size={26} color="#FFFFFF" />
                 </TouchableOpacity>
                 <Text style={styles.title}>Statistics</Text>
             </View>
 
-            <ScrollView>
-            <WeeklyGraph />
-            <DailyGraph />
-            <AllTimeGraph />
+            <ScrollView contentContainerStyle={styles.scrollContent}>
+                
+                <WeeklyGraph />
+                <DailyGraph />
+                <AiReviewsGraph />
+                <AllTimeGraph />
             </ScrollView>
         </SafeAreaView>
     )
@@ -56,6 +59,9 @@ const styles = StyleSheet.create({
         fontSize: 26,
         fontWeight: 'bold',
         color: '#FFFFFF',
-        textAlign: 'center', 
+        textAlign: 'center',
+    },
+    scrollContent: {
+        paddingBottom: 20,
     }
 })
