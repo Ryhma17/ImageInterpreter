@@ -7,6 +7,7 @@ import { Ionicons } from "@expo/vector-icons";
 import WeeklyGraph from "../components/WeeklyGraph";
 import DailyGraph from "../components/DailyGraph";
 import AiReviewsGraph from "../components/AiReviewsGraph";
+import AllTimeGraph from "../components/AllTimeGraph";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Graph">
 
@@ -28,6 +29,7 @@ const GraphsScreen = ({ navigation }: Props) => {
                 <WeeklyGraph />
                 <DailyGraph />
                 <AiReviewsGraph />
+                <AllTimeGraph />
             </ScrollView>
         </SafeAreaView>
     )
