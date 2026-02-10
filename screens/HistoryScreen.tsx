@@ -9,7 +9,7 @@ import { auth, db, collection, Timestamp } from '../firebase/Config'
 import { onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from 'firebase/firestore'
 import { deleteLocalImage } from '../services/localStorageService'
 import { Alert } from 'react-native'
-import { updateLocalDataRating } from '../services/localStorageForData'
+import { updateLocalDataRating, deleteLocalData } from '../services/localStorageForData'
 
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { CommonActions } from '@react-navigation/native'
@@ -155,8 +155,24 @@ const HistoryScreen = ({ navigation }: Props) => {
       await deleteDoc(doc(db, "data", userId, "history", selectedItem.id));
 
       if (selectedItem.image && selectedItem.image.uri) {
-
         await deleteLocalImage(selectedItem.image.uri);
+      }
+
+      let timestampToDelete: number | null = null;
+
+      const date = selectedItem.date;
+
+      if (date && typeof date.toMillis === 'function') {
+        timestampToDelete = date.toMillis();
+      }
+      else if (date instanceof Date) {
+        timestampToDelete = date.getTime();
+      }
+      else if (typeof date === 'number') {
+        timestampToDelete = date;
+      }
+      if (timestampToDelete !== null) {
+        await deleteLocalData(timestampToDelete);
       }
 
       setModalVisible(false);
