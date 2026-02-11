@@ -171,12 +171,14 @@ const PreviewScreen = ({ route, navigation }: Props) => {
         <View style={styles.loading}>
           <ActivityIndicator size='large' color="#FF6F00" />
         </View> : null}
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.container}
+          >
         <Image source={{ uri: imageLocal }} style={styles.image} />
         <Text style={styles.title}>Ask a question about this image:</Text>
         <View style={styles.textInputContainer}>
+          
           <TextInput
             style={styles.text}
             placeholder='e.g What is in the picture?'
@@ -184,12 +186,14 @@ const PreviewScreen = ({ route, navigation }: Props) => {
             onChangeText={setPrompt}
             value={prompt ?? ""}
             editable={!isAnalyzing} />
+          
         </View>
+        
         <View style={styles.buttonContainer}>
           <BasicButton text="Cancel" onPress={onCancel} BgColor='#2c2c2c' />
           <BasicButton text="Analyze" onPress={onAnalyze} BgColor='#ffae03' />
         </View>
-      </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
     </SafeAreaView>
   )
 }
@@ -197,12 +201,17 @@ const PreviewScreen = ({ route, navigation }: Props) => {
 export default PreviewScreen
 
 const styles = StyleSheet.create({
+  container: {
+        flex: 1,
+        backgroundColor: "#262626",
+        justifyContent: "center",
+        paddingHorizontal: 16
+
+  },
   safeAreaContainer: {
     flex: 1,
     flexDirection: "column",
     backgroundColor: "#262626",
-    justifyContent: "center",
-    paddingHorizontal: 16
   },
   image: {
     width: "100%",
