@@ -1,5 +1,5 @@
 import { db, addDoc, collection, Timestamp, runTransaction, increment, doc } from "../firebase/Config"
-import { getDocs } from "firebase/firestore"
+import { getDocs, onSnapshot } from "firebase/firestore"
 import type { UsageEvent } from "../types/GraphTypes"
 
 const UploadData = async (
@@ -113,4 +113,11 @@ const getAiReviews = async (userId: string): Promise<{ rating?: number }[]> => {
     });
 };
 
-export { UploadData, parseLocation, getGraphData, insertTestTimestamps, getAiReviews }
+const loadAllTimeScans = (userId: string, callback: (total: number) => void) => {
+    return onSnapshot(doc(db, 'data', userId, 'usageAmount', 'allTime'), (snap) => {
+        const data = snap.data()
+        callback(data?.total ?? 0)
+    })
+}
+
+export { UploadData, parseLocation, getGraphData, insertTestTimestamps, getAiReviews, loadAllTimeScans }
