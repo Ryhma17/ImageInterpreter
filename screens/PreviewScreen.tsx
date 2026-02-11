@@ -1,4 +1,4 @@
-import { StyleSheet, Text, Image, TextInput, View, Alert, ActivityIndicator } from 'react-native'
+import { StyleSheet, Text, Image, TextInput, View, Alert, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native'
 import { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import BasicButton from '../components/BasicButton'
@@ -171,22 +171,25 @@ const PreviewScreen = ({ route, navigation }: Props) => {
         <View style={styles.loading}>
           <ActivityIndicator size='large' color="#FF6F00" />
         </View> : null}
-
-      <Image source={{ uri: imageLocal }} style={styles.image} />
-      <Text style={styles.title}>Ask a question about this image:</Text>
-      <View style={styles.textInputContainer}>
-        <TextInput
-          style={styles.text}
-          placeholder='e.g What is in the picture?'
-          placeholderTextColor="#6d6c6c"
-          onChangeText={setPrompt}
-          value={prompt ?? ""}
-          editable={!isAnalyzing} />
-      </View>
-      <View style={styles.buttonContainer}>
-        <BasicButton text="Cancel" onPress={onCancel} BgColor='#2c2c2c' />
-        <BasicButton text="Analyze" onPress={onAnalyze} BgColor='#ffae03' />
-      </View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <Image source={{ uri: imageLocal }} style={styles.image} />
+        <Text style={styles.title}>Ask a question about this image:</Text>
+        <View style={styles.textInputContainer}>
+          <TextInput
+            style={styles.text}
+            placeholder='e.g What is in the picture?'
+            placeholderTextColor="#6d6c6c"
+            onChangeText={setPrompt}
+            value={prompt ?? ""}
+            editable={!isAnalyzing} />
+        </View>
+        <View style={styles.buttonContainer}>
+          <BasicButton text="Cancel" onPress={onCancel} BgColor='#2c2c2c' />
+          <BasicButton text="Analyze" onPress={onAnalyze} BgColor='#ffae03' />
+        </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   )
 }
