@@ -1,11 +1,10 @@
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native'
+import { View, Text, StyleSheet, ActivityIndicator, Dimensions } from 'react-native'
 import { useEffect, useState } from 'react'
-import { AllTimeData, ScannedItem, UsageEvent } from '../types/GraphTypes'
-import { getLocalData } from '../services/localStorageForData'
-import AllTimeGraphData from '../services/getAllTimeData'
-import AllTimeUsageChart  from './AllTimeUsageChart'
 import { auth } from '../firebase/Config'
+import { loadAllTimeScans } from '../services/dataUploadToFireStore'
+import { LineChart } from 'react-native-chart-kit'
 
+const screenWidth = Dimensions.get("window").width
 
 type Props = {
   title?: string
@@ -13,37 +12,36 @@ type Props = {
 
 
 const AllTimeGraph = ({ title = "All time scans" }: Props) => {
-    const [graphData, setGraphData] = useState<AllTimeData | null>(null)
-    const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState<string | null>(null)
+    const [isLoading, setIsLoading] = useState(true)
+    const [total, setTotal] = useState<number>(0)
 
     useEffect(() => {
-      const load = async () => {
-        const userId = auth.currentUser?.uid
-        if (!userId) {
-          setGraphData(null)
-          return
-        }
-        setIsLoading(true)
-        setError(null)
-        try {
-          //const fetchedEvents = await getGraphData(userId)
-          const localData = await getLocalData()
-          const scans: ScannedItem[] = localData.map(item => ({ timestamp: item.timestamp }))
-          const built = AllTimeGraphData(scans)
-          setGraphData(built)
-        } catch (e: any) {
-          setError(e?.message ?? "Failed to load alltime scans")
-          setGraphData(null)
-        } finally {
-          setIsLoading(false)
-        }
+      const userId = auth.currentUser?.uid
+      if (!userId) {
+        setIsLoading(false)
+        return
       }
-      load()
+
+      const unsubscribe = loadAllTimeScans(userId, (value) => {
+        setTotal(value)
+        setIsLoading(false)
+      })
+      return unsubscribe
     }, [])
 
-    if (!graphData) return null
+    if (isLoading) return null
     
+    const half = total / 2
+    
+    const chartData = {
+      labels: ["", ""],
+      datasets: [
+        {
+          data: [0, half ,total]
+        }
+      ]
+    }
+
 
   return (
     <View style={styles.card}>
@@ -51,9 +49,39 @@ const AllTimeGraph = ({ title = "All time scans" }: Props) => {
         <Text style={styles.title}>{title}</Text>
         {isLoading ? <ActivityIndicator size="small" color="#FFCA28" /> : null}
       </View>
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
       <View style={styles.chartWrap}>
-        <AllTimeUsageChart data={graphData} />
+        <Text style={{ color: '#FFCA28', fontSize: 32, marginBottom: 16 }}>{total}</Text>
+                
+          <LineChart 
+              data={chartData}
+                width={screenWidth} 
+                height={220}
+                withDots={false}
+                withVerticalLines={false}
+                withInnerLines={true}
+                withOuterLines={true}
+                withHorizontalLabels={true}
+                withVerticalLabels={true}
+                yAxisInterval={1}
+                chartConfig={{
+                  backgroundColor: "#1F1F1F",
+                  backgroundGradientFrom: "#1F1F1F",
+                  backgroundGradientTo: "#1F1F1F",
+                  decimalPlaces: 0,
+                  color: (opacity = 1) => `rgba(255, 202, 40, ${opacity})`,
+                  labelColor: (opacity = 1) => `rgba(170, 170, 170, ${opacity})`,
+                  propsForBackgroundLines: {
+                      strokeWidth: 1,
+                      stroke: "#ffffff"
+                    },
+                }}
+                bezier
+                style={{
+                  paddingRight: 28,
+                  borderRadius: 16
+                  
+                }}
+                  />
       </View>
     </View>
   )

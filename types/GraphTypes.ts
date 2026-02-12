@@ -15,20 +15,3 @@ export type PieData = {
   color: string;
   text: string;
 }
-
-// Yksittäinen skannaus
-export interface ScannedItem {
-  timestamp: number
-}
-
-// Piste linecharttia varten
-export interface LineChartPoint {
-  value: number
-  label?: string
-}
-
-// Kaikki tallennukset
-export interface AllTimeData {
-  totalCount: number
-  chartData: LineChartPoint[]
-}
