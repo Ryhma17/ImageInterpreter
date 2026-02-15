@@ -1,8 +1,9 @@
-import { View, Text, StyleSheet, ActivityIndicator, Dimensions } from 'react-native'
+import { View, Text, StyleSheet, ActivityIndicator, Dimensions, ScrollView } from 'react-native'
 import { useEffect, useState } from 'react'
 import { auth } from '../firebase/Config'
 import { loadAllTimeScans } from '../services/dataUploadToFireStore'
 import { LineChart } from 'react-native-chart-kit'
+import getScanDates from '../services/getTimeStamps'
 
 const screenWidth = Dimensions.get("window").width
 
@@ -14,6 +15,8 @@ type Props = {
 const AllTimeGraph = ({ title = "All time scans" }: Props) => {
     const [isLoading, setIsLoading] = useState(true)
     const [total, setTotal] = useState<number>(0)
+    const [startDate, setStartDate] = useState("")
+    const [endDate, setEndDate] = useState("")
 
     useEffect(() => {
       const userId = auth.currentUser?.uid
@@ -25,6 +28,29 @@ const AllTimeGraph = ({ title = "All time scans" }: Props) => {
       const unsubscribe = loadAllTimeScans(userId, (value) => {
         setTotal(value)
         setIsLoading(false)
+        
+      getScanDates(userId).then(({ firstDate, lastDate }) => {
+        if (firstDate) {
+          setStartDate(
+            firstDate.toLocaleDateString(undefined, {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric"
+            })
+          )
+        }
+
+        if (lastDate) {
+          setEndDate(
+            lastDate.toLocaleDateString(undefined, {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric"
+            })
+          )
+        }
+      })
+
       })
       return unsubscribe
     }, [])
@@ -32,9 +58,9 @@ const AllTimeGraph = ({ title = "All time scans" }: Props) => {
     if (isLoading) return null
     
     const half = total / 2
-    
+
     const chartData = {
-      labels: ["", ""],
+      labels: [startDate, endDate],
       datasets: [
         {
           data: [0, half ,total]
@@ -51,12 +77,13 @@ const AllTimeGraph = ({ title = "All time scans" }: Props) => {
       </View>
       <View style={styles.chartWrap}>
         <Text style={{ color: '#FFCA28', fontSize: 32, marginBottom: 16 }}>{total}</Text>
-                
-          <LineChart 
+          
+            <LineChart 
               data={chartData}
-                width={screenWidth} 
+                width={screenWidth * 1.1} 
                 height={220}
-                withDots={false}
+                withDots={true}
+                yLabelsOffset={40}
                 withVerticalLines={false}
                 withInnerLines={true}
                 withOuterLines={true}
@@ -69,11 +96,20 @@ const AllTimeGraph = ({ title = "All time scans" }: Props) => {
                   backgroundGradientTo: "#1F1F1F",
                   decimalPlaces: 0,
                   color: (opacity = 1) => `rgba(255, 202, 40, ${opacity})`,
-                  labelColor: (opacity = 1) => `rgba(170, 170, 170, ${opacity})`,
+                  labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                   propsForBackgroundLines: {
                       strokeWidth: 1,
-                      stroke: "#ffffff"
+                      stroke: "#FFFFFF"
                     },
+                  propsForDots: {
+                    r: '3',
+                    stroke: '#FFCA28',
+                    
+                  },
+                  propsForLabels: {
+                    dx: 32,
+                    
+                  },
                 }}
                 bezier
                 style={{
@@ -81,7 +117,8 @@ const AllTimeGraph = ({ title = "All time scans" }: Props) => {
                   borderRadius: 16
                   
                 }}
-                  />
+             />
+             
       </View>
     </View>
   )
